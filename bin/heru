@@ -1,0 +1,31 @@
+#!/usr/bin/env coffee
+
+
+require.paths.unshift(__dirname + '/../src')
+heru = require 'heru'
+
+sys = require 'sys'
+os = require 'os'
+
+{ join } = require 'path'
+root = join __dirname, '..'
+
+colors = require 'colors'
+console.log "Heru #{ heru.Version.yellow } on #{ os.hostname().yellow }"
+
+require.paths.unshift(__dirname + '/../library')
+
+loadNode = ->
+  path = os.hostname().split('.').reverse()
+  require join root, 'nodes', path.join('/')
+
+spec = loadNode()
+node = new heru.Node spec
+
+try
+  node.apply()
+catch error
+  console.log "Got an error:".red
+  console.log error
+  console.log error.stack
+
