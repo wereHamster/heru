@@ -1,5 +1,6 @@
 #!/usr/bin/env coffee
 
+require.paths.unshift __dirname + '/../vendor/'
 
 require.paths.unshift(__dirname + '/../src')
 heru = require 'heru'
