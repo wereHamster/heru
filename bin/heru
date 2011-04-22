@@ -1,8 +1,11 @@
 #!/usr/bin/env coffee
 
-require.paths.unshift __dirname + '/../vendor/'
+path = require 'path', fs = require 'fs'
+runtime = fs.realpathSync path.join __dirname, '../';
 
-require.paths.unshift(__dirname + '/../src')
+require.paths.unshift path.join runtime, 'src'
+require.paths.unshift path.join runtime, 'vendor'
+
 heru = require 'heru'
 
 sys = require 'sys'
@@ -14,11 +17,12 @@ root = join __dirname, '..'
 colors = require 'colors'
 console.log "Heru #{ heru.Version.yellow } on #{ os.hostname().yellow }"
 
-require.paths.unshift(__dirname + '/../library')
+require.paths.unshift(process.env.PWD + '/library')
 
 loadNode = ->
-  path = os.hostname().split('.').reverse()
-  require join root, 'nodes', path.join('/')
+  hostname = process.argv[2]
+  path = hostname.split('.').reverse()
+  require join process.env.PWD, 'nodes', path.join('/')
 
 spec = loadNode()
 node = new heru.Node spec
