@@ -1,8 +1,5 @@
 #!/usr/bin/env coffee
 
-# The colors module extends the String prototyp, it does not export anything.
-require 'colors'
-
 { join } = require 'path'
 { realpathSync } = require 'fs'
 
@@ -13,6 +10,10 @@ runtime = realpathSync join __dirname, '../';
 require.paths.unshift join runtime, 'src'
 require.paths.unshift join runtime, 'vendor'
 
+# The colors module extends the String prototyp, it does not export anything.
+require 'colors'
+
+# Load the main heru module.
 heru = require 'heru'
 console.log "Heru #{ heru.Version.yellow }"
 
