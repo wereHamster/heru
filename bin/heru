@@ -1,32 +1,35 @@
 #!/usr/bin/env coffee
 
-path = require 'path', fs = require 'fs'
-runtime = fs.realpathSync path.join __dirname, '../';
-
-require.paths.unshift path.join runtime, 'src'
-require.paths.unshift path.join runtime, 'vendor'
-
-heru = require 'heru'
-
-sys = require 'sys'
-os = require 'os'
+# The colors module extends the String prototyp, it does not export anything.
+require 'colors'
 
 { join } = require 'path'
-root = join __dirname, '..'
+{ realpathSync } = require 'fs'
 
-colors = require 'colors'
-console.log "Heru #{ heru.Version.yellow } on #{ os.hostname().yellow }"
+# Path to the runtime directory.
+runtime = realpathSync join __dirname, '../';
 
+# Add directories with the runtime files to the require path.
+require.paths.unshift join runtime, 'src'
+require.paths.unshift join runtime, 'vendor'
+
+heru = require 'heru'
+console.log "Heru #{ heru.Version.yellow }"
+
+# Hack. We need to have a better way to figure out where the library is.
 require.paths.unshift(process.env.PWD + '/library')
 
-loadNode = ->
-  hostname = process.argv[2]
+# Load the configuration for the given node.
+loadNode = (hostname) ->
   path = hostname.split('.').reverse()
   require join process.env.PWD, 'nodes', path.join('/')
 
-spec = loadNode()
+# There is no way to get the FQDN in node. The user needs to supply the
+# hostname on the commandline.
+spec = loadNode process.argv[2]
 node = new heru.Node spec
 
+# Try to apply the node configuration, catch any errors which may be thrown.
 try
   node.apply()
 catch error
