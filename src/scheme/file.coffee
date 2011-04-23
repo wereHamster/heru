@@ -55,7 +55,7 @@ checkFile = (file, mode, uid) ->
   return true
 
 
-class fileScheme
+class File
   constructor: (@resource, @uri, @options) ->
     @files = expand @uri.pathname
 
@@ -75,5 +75,5 @@ class fileScheme
     console.log options
 
 
-exports.Scheme = fileScheme
+module.exports = File
 

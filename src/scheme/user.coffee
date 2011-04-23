@@ -22,7 +22,7 @@ hash = (login) ->
     c.charCodeAt(0) - 97
   ), (s, v) -> s + v
 
-class userScheme
+class User
 
   constructor: (@resource, uri, options) ->
     _.extend @, options
@@ -37,5 +37,5 @@ class userScheme
       callback(err)
 
 
-exports.Scheme = userScheme
+module.exports = User
 

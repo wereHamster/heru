@@ -12,7 +12,7 @@ fs.readdir basedir, (err, files) ->
     path = join basedir, file
     scheme = basename file, '.coffee'
     callbacks = registry[scheme] || []
-    registry[scheme] = require(path).Scheme
+    registry[scheme] = require(path)
     callback registry[scheme] for callback in callbacks
 
 
