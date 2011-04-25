@@ -5,6 +5,7 @@ http = require 'http'
 sys = require 'sys'
 child = require 'child_process'
 path = require 'path'
+Futures = require 'futures'
 
 download = (url, callback) ->
   { hostname, pathname } = parse url
@@ -50,8 +51,7 @@ module.exports = (source, options) ->
   console.log source
 
   return (targets) ->
-    console.log 'targets: '
-    console.log targets
+    future = Futures.future()
     install source, options, (err) ->
-      console.log err
-
+      future.deliver err
+    return future

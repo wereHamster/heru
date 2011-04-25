@@ -2,6 +2,7 @@
 { _ } = require 'underscore'
 { exec } = require 'child_process'
 { to_html: render } = require 'mustache'
+Futures = require 'futures'
 
 
 # Command to check, create and update the user. It is ugly, because it's
@@ -30,12 +31,22 @@ class User
     @login = uri.host
     @uid = 9000 + hash(@login)
 
-  apply: (callback) ->
-    console.log('Validating user ' + @login)
+  verify: ->
+    future = Futures.future()
+    exec "id -u #{@login}", (err, stdout, stderr) ->
+      if err
+        future.deliver err
+      else if @uid isnt parseInt stdout
+        future.deliver new Error "User has incorrect UID"
+      else
+        future.deliver null
+    return future
 
+  amend: ->
+    future = Futures.future()
     exec render(cmd, @), (err, stdout, stderr) =>
-      callback(err)
-
+      future.deliver err
+    return future
 
 module.exports = User
 

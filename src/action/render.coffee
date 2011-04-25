@@ -2,7 +2,7 @@
 fs = require 'fs'
 { to_html: render} = require('mustache')
 { join, existsSync } = require 'path'
-
+Futures = require 'futures'
 
 # Create directories leading up to `path`.
 mkdirp = (path) ->
@@ -28,4 +28,8 @@ module.exports = (template) ->
     contents = fs.readFileSync @base + '/assets/' + template
     renderedData = render contents + '', @constructor
     fs.writeFileSync file, render('' + contents, @constructor)
+
+    future = Futures.future()
+    future.deliver null
+    return future
 

@@ -2,6 +2,16 @@
 { _ } = require 'underscore'
 url = require 'url'
 render = require('mustache').to_html
+Futures = require 'futures'
+
+joinToFuture = (join, msg) ->
+  future = Futures.future()
+  join.when ->
+    if _.any arguments, ((arg) -> arg[0])
+      future.deliver new Error msg
+    else
+      future.deliver null
+  return future
 
 Resource = require 'resource'
 class Manifest
@@ -14,10 +24,16 @@ class Manifest
       continue if uri == 'constructor' or uri in _.keys Manifest.prototype
       @resources[uri] = new Resource @, url.parse(uri), initializer()
 
-  apply: ->
-    for uri, res of @resources
-      console.log "Validating #{ uri }"
-      res.validate()
+  verify: ->
+    console.log 'manifest verify'
+    join = Futures.join()
+    join.add res.verify() for uri, res of @resources
+    return joinToFuture join, "Manifest verify failed"
+
+  amend: ->
+    join = Futures.join()
+    join.add res.amend() for uri, res of @resources
+    return joinToFuture join, "Manifest amend failed"
 
   # Expand the string in the context of the manifest.
   expand: (str) ->

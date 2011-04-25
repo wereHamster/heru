@@ -1,5 +1,5 @@
 
 module.exports =
-  'file': require 'scheme/file'
   'user': require 'scheme/user'
+  'path': require 'scheme/path'
 

@@ -3,12 +3,14 @@ schemeRegistry = require 'scheme'
 
 class Resource
   constructor: (@manifest, @uri, @options) ->
-
-  validate: ->
-    scheme = schemeRegistry[@uri.protocol.replace(':', '')]
+    scheme = schemeRegistry[@uri.protocol.replace ':', '']
     @scheme = new scheme @, @uri, @options
-    @scheme.apply (err, exists) ->
-      console.log err
+
+  verify: ->
+    return @scheme.verify()
+
+  amend: ->
+    return @scheme.amend()
 
 
 module.exports = Resource
