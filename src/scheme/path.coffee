@@ -111,8 +111,14 @@ class Path
     return joinToFuture join, "Verification of #{@uri.pathname} failed"
 
   amend: ->
-    func = @options.action.call @resource.manifest
-    func.call @resource.manifest, @paths
+    if @options.type is 'dire'
+      future = Futures.future()
+      fs.mkdir @paths[0], @options.mode, (err) ->
+        future.deliver err
+      return future
+    else
+      func = @options.action.call @resource.manifest
+      func.call @resource.manifest, @paths
 
 
 module.exports = Path

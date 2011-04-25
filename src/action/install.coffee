@@ -53,5 +53,7 @@ module.exports = (source, options) ->
   return (targets) ->
     future = Futures.future()
     install source, options, (err) ->
+      console.log err
       future.deliver err
     return future
+
