@@ -12,8 +12,12 @@ loadModule = (name) ->
 joinToFuture = (join, msg) ->
   future = Futures.future()
   join.when ->
-    if _.any arguments, ((arg) -> arg[0])
-      future.deliver new Error msg
+    args = Array.prototype.slice.call arguments
+    console.log args
+    errors = _.compact(args)
+    console.log errors
+    if errors.length > 0
+      future.deliver new Error(msg), errors
     else
       future.deliver null
   return future
@@ -24,9 +28,7 @@ class Node
 
   verify: ->
     console.log 'node verify'
-    console.log @manifests
     join = Futures.join()
-    @manifests[0].verify()
     join.add manifest.verify() for manifest in @manifests
     return joinToFuture join, "Node verify failed"
 

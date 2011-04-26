@@ -2,6 +2,7 @@
 
 { join } = require 'path'
 { realpathSync } = require 'fs'
+{ inspect } = require 'sys'
 
 # Path to the runtime directory.
 runtime = realpathSync join __dirname, '../';
@@ -30,12 +31,21 @@ loadNode = (hostname) ->
 spec = loadNode process.argv[2]
 node = new heru.Node spec
 
+dumpErrors = (args, indent = 0) ->
+  console.log args
+  for k, errs of args
+    if errs[0]
+      console.log errs
+      dumpErrors errs[0], indent + 1
+
 # Try to apply the node configuration, catch any errors which may be thrown.
 try
   future = node.verify()
   future.when (err) ->
+    console.log arguments
     if err
-      console.log err
+      console.log err.message
+      dumpErrors Array.prototype.slice.call arguments
       node.amend()
     else
       console.log "Node verification passed"

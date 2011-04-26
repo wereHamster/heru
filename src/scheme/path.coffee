@@ -79,8 +79,10 @@ chown = (path, owner, group) ->
 joinToFuture = (join, msg) ->
   future = Futures.future()
   join.when ->
-    if _.any arguments, ((arg) -> arg[0])
-      future.deliver new Error msg
+    args = Array.prototype.slice.call arguments
+    errors = _.map _.compact(args), (e) -> e[0]
+    if errors.length > 0
+      future.deliver new Error(msg), errors
     else
       future.deliver null
   return future
@@ -94,7 +96,6 @@ verifyPath = (path, options) ->
   join = Futures.join()
   stat = statSync path
 
-  console.log stat
   join.add chmod path, options.mode
   if (stat.mode & 0777) isnt options.mode
     join.add runCommand "chmod #{ options.mode } #{ path }"

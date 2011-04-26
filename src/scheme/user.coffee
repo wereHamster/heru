@@ -33,10 +33,11 @@ class User
 
   verify: ->
     future = Futures.future()
-    exec "id -u #{@login}", (err, stdout, stderr) ->
+    exec "id -u #{@login}", (err, stdout, stderr) =>
       if err
         future.deliver err
       else if @uid isnt parseInt stdout
+        console.log "#{@uid} - #{stdout}"
         future.deliver new Error "User has incorrect UID"
       else
         future.deliver null

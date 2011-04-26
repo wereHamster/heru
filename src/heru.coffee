@@ -11,3 +11,5 @@ exports.Node = require 'node'
 exports.Manifest = require 'manifest'
 exports.Action = require 'action'
 
+exports.Utils = require './utils'
+
