@@ -28,3 +28,19 @@ exports.expand = (str) ->
 
   return collect _.compact str.split /({|}|,)/
 
+
+/* Return a future which will be delivered the result of the join. If any
+ * of the tasks in the join fail, the future fails. */
+exports.joinToFuture = (join, msg) ->
+  future = Futures.future()
+
+  join.when ->
+    args = Array.prototype.slice.call arguments
+    errors = _.compact(args)
+    if errors.length > 0
+      future.deliver new Error(msg), errors
+    else
+      future.deliver null
+
+  return future
+
