@@ -3,7 +3,7 @@
 Futures = require 'futures'
 
 
-/* Perform a bash-like brace expansion on the given string. */
+# Perform a bash-like brace expansion on the given string.
 exports.expand = (str) ->
   merge = (array, element) ->
     (el + element) for el in array
@@ -28,9 +28,8 @@ exports.expand = (str) ->
 
   return collect _.compact str.split /({|}|,)/
 
-
-/* Return a future which will be delivered the result of the join. If any
- * of the tasks in the join fail, the future fails. */
+# Return a future which will be delivered the result of the join. If any
+# of the tasks in the join fail, the future fails.
 exports.joinToFuture = (join, msg) ->
   future = Futures.future()
 
