@@ -3,18 +3,7 @@
 url = require 'url'
 render = require('mustache').to_html
 Futures = require 'futures'
-
-joinToFuture = (join, msg) ->
-  future = Futures.future()
-  join.when ->
-    args = Array.prototype.slice.call arguments
-    errors = _.map _.compact(args), (e) -> e[0]
-    if errors.length > 0
-      console.log errors
-      future.deliver new Error(msg), errors
-    else
-      future.deliver null
-  return future
+{ joinToFuture } = require 'utils'
 
 Resource = require 'resource'
 class Manifest

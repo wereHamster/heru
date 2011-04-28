@@ -6,6 +6,7 @@ path = require 'path'
 existsSync = path.existsSync
 { exec } = require 'child_process'
 Futures = require 'futures'
+{ joinToFuture } = require 'utils'
 
 expand = (path) ->
   tokens = _.compact path.split /({|}|,)/
@@ -75,17 +76,6 @@ chmod = (path, mode) ->
 
 chown = (path, owner, group) ->
   return runCommand "chown #{ owner }:#{ group } #{ path }"
-
-joinToFuture = (join, msg) ->
-  future = Futures.future()
-  join.when ->
-    args = Array.prototype.slice.call arguments
-    errors = _.map _.compact(args), (e) -> e[0]
-    if errors.length > 0
-      future.deliver new Error(msg), errors
-    else
-      future.deliver null
-  return future
 
 verifyPath = (path, options) ->
   console.log "Verifying #{path}"

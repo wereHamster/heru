@@ -31,20 +31,23 @@ loadNode = (hostname) ->
 spec = loadNode process.argv[2]
 node = new heru.Node spec
 
+ind = (indent) ->
+  a = []
+  while indent--
+    a.push '  '
+  return a.join('')
+
 dumpErrors = (args, indent = 0) ->
-  console.log args
-  for k, errs of args
-    if errs[0]
-      console.log errs
-      dumpErrors errs[0], indent + 1
+  console.log "#{ind(indent)}#{args[0].message}" if args[0]
+  for k, errs of args[1]
+    dumpErrors errs, indent + 1
 
 # Try to apply the node configuration, catch any errors which may be thrown.
 try
   future = node.verify()
   future.when (err) ->
-    console.log arguments
     if err
-      console.log err.message
+      console.log "Verify failed: #{err.message}"
       dumpErrors Array.prototype.slice.call arguments
       node.amend()
     else
