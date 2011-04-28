@@ -37,10 +37,12 @@ ind = (indent) ->
     a.push '  '
   return a.join('')
 
-dumpErrors = (args, indent = 0) ->
-  console.log "#{ind(indent)}#{args[0].message}" if args[0]
-  for k, errs of args[1]
-    dumpErrors errs, indent + 1
+dumpError = (err, indent = 0) ->
+  console.log "  #{ind(indent)}#{err.message}" if err
+  return unless err.children
+
+  for err in err.children
+    dumpError err, indent + 1
 
 # Try to apply the node configuration, catch any errors which may be thrown.
 try
@@ -48,8 +50,8 @@ try
   future.when (err) ->
     if err
       console.log "Verify failed: #{err.message}"
-      dumpErrors Array.prototype.slice.call arguments
-      node.amend()
+      dumpError arguments['0']
+      #node.amend()
     else
       console.log "Node verification passed"
 

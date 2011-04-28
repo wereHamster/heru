@@ -35,6 +35,7 @@ module.exports =
     future.when ->
       args = Array.prototype.slice.call arguments
       assert.length args, 1
+      assert.isNull args[0]
 
   'joinToFuture: error': ->
     future = Futures.future()
@@ -46,8 +47,8 @@ module.exports =
     future = joinToFuture join, 'msg'
     future.when ->
       args = Array.prototype.slice.call arguments
-      assert.length args, 2
+      assert.length args, 1
       assert.equal args[0].message, 'msg'
-      assert.length args[1], 1
-      assert.equal args[1][0][0].message, 'err'
+      assert.length args[0].children, 1
+      assert.equal args[0].children[0].message, 'err'
 
