@@ -1,7 +1,10 @@
 
 { _ } = require 'underscore'
+Futures = require 'futures'
 
-exports.expand = (path) ->
+
+/* Perform a bash-like brace expansion on the given string. */
+exports.expand = (str) ->
   merge = (array, element) ->
     (el + element) for el in array
 
@@ -23,5 +26,5 @@ exports.expand = (path) ->
     ret.push current
     return _.flatten(ret)
 
-  return collect _.compact path.split /({|}|,)/
+  return collect _.compact str.split /({|}|,)/
 
