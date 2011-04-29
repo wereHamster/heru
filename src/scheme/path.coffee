@@ -84,11 +84,7 @@ verifyPath = (path, options) ->
     return future.deliver new Error "#{path} does not exist"
 
   join = Futures.join()
-  stat = statSync path
-
   join.add chmod path, options.mode
-  if (stat.mode & 0777) isnt options.mode
-    join.add runCommand "chmod #{ options.mode } #{ path }"
 
   return joinToFuture join, "Verification of #{path} failed"
 
