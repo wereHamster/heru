@@ -10,19 +10,18 @@ loadModule = (name) ->
   return new (require path)(path.replace '/manifest.coffee', '')
 
 class Node
-  constructor: (spec)->
+  constructor: (@name, @spec)->
     @manifests = (loadModule name for name in spec.manifests)
 
   verify: ->
-    console.log 'node verify'
     join = Futures.join()
     join.add manifest.verify() for manifest in @manifests
-    return joinToFuture join, "Node verify failed"
+    return joinToFuture join, "Node '#{@name}' verify failed"
 
   amend: ->
     join = Futures.join()
     join.add manifest.amend() for manifest in @manifests
-    return joinToFuture join, "Node amend failed"
+    return joinToFuture join, "Node '#{@name}' amend failed"
 
 
 module.exports = Node

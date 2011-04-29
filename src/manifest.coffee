@@ -9,7 +9,6 @@ Resource = require 'resource'
 class Manifest
   constructor: (@base) ->
     @name = @base.split('/').pop()
-    console.log "Base directory for #{ @name }: #{ @base }"
 
     @resources = { }
     for uri, initializer of @constructor.prototype
@@ -17,15 +16,14 @@ class Manifest
       @resources[uri] = new Resource @, url.parse(uri), initializer()
 
   verify: ->
-    console.log 'manifest verify'
     join = Futures.join()
     join.add res.verify() for uri, res of @resources
-    return joinToFuture join, "Manifest verify failed"
+    return joinToFuture join, "Manifest '#{@name}' verify failed"
 
   amend: ->
     join = Futures.join()
     join.add res.amend() for uri, res of @resources
-    return joinToFuture join, "Manifest amend failed"
+    return joinToFuture join, "Manifest '#{@name}' amend failed"
 
   # Expand the string in the context of the manifest.
   expand: (str) ->

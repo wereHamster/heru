@@ -11,7 +11,7 @@ runtime = realpathSync join __dirname, '../';
 require.paths.unshift join runtime, 'src'
 require.paths.unshift join runtime, 'vendor'
 
-# The colors module extends the String prototyp, it does not export anything.
+# The colors module extends the String prototype, it does not export anything.
 require 'colors'
 
 # Load the main heru module.
@@ -29,7 +29,7 @@ loadNode = (hostname) ->
 # There is no way to get the FQDN in node. The user needs to supply the
 # hostname on the commandline.
 spec = loadNode process.argv[2]
-node = new heru.Node spec
+node = new heru.Node process.argv[2], spec
 
 ind = (indent) ->
   a = []
