@@ -44,8 +44,6 @@ class Node
 
   bootstrap: ->
     return checkIntegrity @manifests
-    return joinMethods.call @, @manifests, 'bootstrap', ->
-      return checkIntegrity @manifests
 
   verify: ->
     return joinMethods.call @, @manifests, 'verify'
