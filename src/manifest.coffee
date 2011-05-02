@@ -20,8 +20,7 @@ class Manifest
     future.deliver null
     return future
 
-  verify: =>
-    console.log @constructor.name
+  verify: ->
     return joinMethods.call @, _.values(@resources), 'verify'
 
   amend: ->

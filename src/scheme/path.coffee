@@ -78,7 +78,6 @@ chown = (path, owner, group) ->
   return runCommand "chown #{ owner }:#{ group } #{ path }"
 
 verifyPath = (path, options) ->
-  console.log "Verifying #{path}"
   future = Futures.future()
   unless existsSync path
     return future.deliver new Error "#{path} does not exist"
