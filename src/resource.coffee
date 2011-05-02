@@ -1,5 +1,7 @@
 
 schemeRegistry = require 'scheme'
+Utils = require 'utils'
+{ expand, joinToFuture } = Utils
 
 class Resource
   constructor: (@manifest, @uri, @options) ->
@@ -7,7 +9,7 @@ class Resource
     @scheme = new scheme @, @uri, @options
 
   decompose: ->
-    return [ @uri.href ]
+    return expand @uri.href
 
   verify: ->
     return @scheme.verify()

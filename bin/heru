@@ -44,22 +44,32 @@ dumpError = (err, indent = 0) ->
   for err in err.children
     dumpError err, indent + 1
 
-futureChain = (obj, method) ->
-  args = Array.prototype.slice.call arguments
-
-  future = obj[method]()
-  future.when (err) ->
+amend = (node) ->
+  node.amend().when (err) ->
     if err
+      console.log "Amend failed."
       dumpError err
-    else if args[2]
-      process.nextTick ->
-        args = args.slice 2
-        args.unshift obj
-        futureChain.apply @, args
+
+verify = (node) ->
+  node.verify().when (err) ->
+    if err
+      console.log "Verify failed."
+      dumpError err
+      amend(node)
+    else
+      console.log "Node verified. Everything ok."
+
+bootstrap = (node) ->
+  node.bootstrap().when (err) ->
+    if err
+      console.log "Bootstrap failed."
+      dumpError err
+    else
+      verify(node)
 
 # Try to apply the node configuration, catch any errors which may be thrown.
 try
-  futureChain node, 'bootstrap', 'verify', 'amend'
+  bootstrap node
 
 catch error
   console.log "Got an error:".red
