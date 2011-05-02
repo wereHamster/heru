@@ -30,7 +30,7 @@ exports.expand = (str) ->
 
 # Return a future which will be delivered the result of the join. If any
 # of the tasks in the join fail, the future fails.
-exports.joinToFuture = (join, msg) ->
+exports.joinToFuture = joinToFuture = (join, msg) ->
   future = Futures.future()
 
   join.when ->
@@ -41,7 +41,14 @@ exports.joinToFuture = (join, msg) ->
       error.children = errors
       future.deliver error
     else
-      future.deliver null
+      args = _.map args, (e) -> e.slice(1)
+      args.unshift null
+      future.deliver.apply this, args
 
   return future
+
+exports.joinMethods = (collection, method) ->
+  join = Futures.join()
+  join.add member[method]() for member in collection
+  return joinToFuture join, "#{@constructor.name} '#{@name}' :: #{method}"
 

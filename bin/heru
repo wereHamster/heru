@@ -38,22 +38,28 @@ ind = (indent) ->
   return a.join('')
 
 dumpError = (err, indent = 0) ->
-  console.log "  #{ind(indent)}#{err.message}" if err
+  console.log "#{ind(indent)}#{err.message}" if err
   return unless err.children
 
   for err in err.children
     dumpError err, indent + 1
 
-# Try to apply the node configuration, catch any errors which may be thrown.
-try
-  future = node.verify()
+futureChain = (obj, method) ->
+  args = Array.prototype.slice.call arguments
+
+  future = obj[method]()
   future.when (err) ->
     if err
-      console.log "Verify failed: #{err.message}"
-      dumpError arguments['0']
-      #node.amend()
-    else
-      console.log "Node verification passed"
+      dumpError err
+    else if args[2]
+      process.nextTick ->
+        args = args.slice 2
+        args.unshift obj
+        futureChain.apply @, args
+
+# Try to apply the node configuration, catch any errors which may be thrown.
+try
+  futureChain node, 'bootstrap', 'verify', 'amend'
 
 catch error
   console.log "Got an error:".red

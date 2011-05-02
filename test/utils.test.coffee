@@ -26,7 +26,7 @@ module.exports =
 
   'joinToFuture: no error': ->
     future = Futures.future()
-    future.deliver null
+    future.deliver null, 'data1', 'data2'
 
     join = Futures.join()
     join.add future
@@ -34,8 +34,7 @@ module.exports =
     future = joinToFuture join, "msg"
     future.when ->
       args = Array.prototype.slice.call arguments
-      assert.length args, 1
-      assert.isNull args[0]
+      assert.deepEqual args, [ null, [ 'data1', 'data2' ] ]
 
   'joinToFuture: error': ->
     future = Futures.future()

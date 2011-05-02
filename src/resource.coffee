@@ -6,6 +6,9 @@ class Resource
     scheme = schemeRegistry[@uri.protocol.replace ':', '']
     @scheme = new scheme @, @uri, @options
 
+  decompose: ->
+    return [ @uri.href ]
+
   verify: ->
     return @scheme.verify()
 
