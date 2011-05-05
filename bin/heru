@@ -44,35 +44,19 @@ dumpError = (err, indent = 0) ->
   for err in err.children
     dumpError err, indent + 1
 
-amend = (node) ->
-  node.amend().when (err) ->
-    if err
-      console.log "Amend failed."
-      dumpError err
 
-verify = (node) ->
+# This is where it comes all together.
+node.init().when (err) ->
+  if err
+    console.log 'Initialization failed.'
+    return dumpError err
+
   node.verify().when (err) ->
     if err
-      console.log "Verify failed."
+      console.log 'Node is in incomplete state. Taking corrective measures.'
       dumpError err
-      amend(node)
+      node.amend().when (err) ->
+        dumpError err if err
     else
-      console.log "Node verified. Everything ok."
-
-bootstrap = (node) ->
-  node.bootstrap().when (err) ->
-    if err
-      console.log "Bootstrap failed."
-      dumpError err
-    else
-      verify(node)
-
-# Try to apply the node configuration, catch any errors which may be thrown.
-try
-  bootstrap node
-
-catch error
-  console.log "Got an error:".red
-  console.log error
-  console.log error.stack
+      console.log 'Node verified. Nothing to do'
 

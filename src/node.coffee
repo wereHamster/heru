@@ -42,7 +42,7 @@ class Node
   constructor: (@name, @spec)->
     @manifests = (loadModule name for name in spec.manifests)
 
-  bootstrap: ->
+  init: ->
     return checkIntegrity @manifests
 
   verify: ->
