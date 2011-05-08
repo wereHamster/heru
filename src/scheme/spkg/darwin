@@ -1,0 +1,9 @@
+#!/bin/sh
+
+case "${1}" in
+  "verify" )
+    exec brew info "${2}" | grep -q "Cellar/${2}" ;;
+  "amend" )
+    exec brew install "${2}" ;;
+esac
+

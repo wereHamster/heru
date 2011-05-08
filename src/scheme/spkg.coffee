@@ -3,6 +3,25 @@
 { exec } = require 'child_process'
 Futures = require 'futures'
 
+
+system = Futures.future()
+exec 'uname -s', (err, stdout, stderr) ->
+  system.deliver err, stdout.toLowerCase().replace('\n', '')
+
+
+run = (method, name) ->
+  future = Futures.future()
+  system.whenever (err, system) ->
+    cmd = "#{__dirname}/spkg/#{system} '#{method}' '#{name}'"
+    exec cmd, (err, stdout, stderr) ->
+      if err
+        future.deliver new Error "spkg #{method} #{name} failed"
+      else
+        future.deliver null
+
+  return future
+
+
 class spkg
 
   constructor: (@resource, uri, options) ->
@@ -10,24 +29,10 @@ class spkg
     @name = uri.host
 
   verify: ->
-    future = Futures.future()
-    exec "brew info #{@name} | grep -q 'Not installed'", (err, stdout, stderr) =>
-      if err
-        future.deliver null
-      else
-        future.deliver new Error "Package #{@name} not installed"
-    return future
+    return run 'verify', @name
 
   amend: ->
-    future = Futures.future()
-    exec "brew install #{@name}", (err, stdout, stderr) =>
-      if err
-        error = new Error "Package #{@name} failed to install"
-        error.children = [ err ]
-        future.deliver error
-      else
-        future.deliver null
-    return future
+    return run 'amend', @name
 
 module.exports = spkg
 
