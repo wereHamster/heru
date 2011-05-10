@@ -111,19 +111,26 @@ class Path
     @paths = expand @uri.pathname
 
   verify: ->
+    unless @options.type in ['dire', 'file']
+      future = Futures.future()
+      return future.deliver new Error "Unknown path type #{@options.type}"
+
     join = Futures.join()
     join.add verifyPath path, @options for path in @paths
     return joinToFuture join, "Verification of #{@uri.pathname} failed"
 
   amend: ->
-    if @options.type is 'dire'
-      future = Futures.future()
-      fs.mkdir @paths[0], @options.mode, (err) ->
-        future.deliver err
-      return future
-    else
-      func = @options.action.call @resource.manifest
-      func.call @resource.manifest, @paths
+    future = Futures.future()
+
+    switch @options.type
+      when 'dire'
+        fs.mkdir @paths[0], @options.mode, (err) ->
+          future.deliver err
+      when 'file'
+        func = @options.action.call @resource.manifest
+        future = func.call @resource.manifest, @paths
+
+    return future
 
 
 module.exports = Path
