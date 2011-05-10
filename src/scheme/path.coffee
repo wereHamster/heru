@@ -71,7 +71,9 @@ runCommand = (cmd) ->
 chmod = (path, mode) ->
   future = Futures.future()
   fs.chmod path, mode, (err) ->
-    future.deliver err
+    if err
+      return future.deliver new Error "chmod: #{err.message}"
+    future.deliver null
   return future
 
 chown = (path, owner, group) ->
