@@ -61,10 +61,8 @@ checkFile = (file, mode, uid) ->
 # Run the given command, return a future which will be delivered the err,
 # stdout and stderr.
 runCommand = (cmd) ->
-  console.log "Running command: #{ cmd }"
   future = Futures.future()
   exec cmd, (err, stdout, stderr) ->
-    console.log err
     future.deliver err, stdout, stderr
   return future
 
@@ -86,6 +84,7 @@ verifyPath = (path, options) ->
 
   join = Futures.join()
   join.add chmod path, options.mode
+  join.add chown path, options.user, options.group
 
   return joinToFuture join, "Verification of #{path} failed"
 
