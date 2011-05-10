@@ -77,6 +77,23 @@ chmod = (path, mode) ->
 chown = (path, owner, group) ->
   return runCommand "chown #{ owner }:#{ group } #{ path }"
 
+typeMap =
+  file: 'isFile'
+  dire: 'isDirectory'
+
+checkType = (path, type) ->
+  future = Futures.future()
+  try
+    stat = statSync path
+    console.log stat[typeMap[type]]()
+    if stat[typeMap[type]]()
+      future.deliver null
+    else
+      future.deliver new Error "#{path} has wrong type"
+  catch err
+    future.deliver err
+  return future
+
 verifyPath = (path, options) ->
   future = Futures.future()
   unless existsSync path
@@ -85,6 +102,7 @@ verifyPath = (path, options) ->
   join = Futures.join()
   join.add chmod path, options.mode
   join.add chown path, options.user, options.group
+  join.add checkType path, options.type
 
   return joinToFuture join, "Verification of #{path} failed"
 
