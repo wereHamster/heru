@@ -4,9 +4,11 @@ fs = require 'fs'
 { statSync } = require 'fs'
 path = require 'path'
 existsSync = path.existsSync
+dirname = path.dirname
 { exec } = require 'child_process'
 Futures = require 'futures'
 { joinToFuture } = require 'utils'
+url = require 'url'
 
 expand = (path) ->
   tokens = _.compact path.split /({|}|,)/
@@ -106,9 +108,18 @@ verifyPath = (path, options) ->
 
   return joinToFuture join, "Verification of #{path} failed"
 
+pathResource = (path) ->
+  Resource = require 'resource'
+  uri = url.parse "path:#{dirname(path)}"
+  return new Resource null, uri,
+    type: 'dire', mode: 0644, user: 'root', group: 'wheel'
+
 class Path
   constructor: (@resource, @uri, @options) ->
     @paths = expand @uri.pathname
+
+  deps: ->
+    return _.map @paths, pathResource
 
   verify: ->
     unless @options.type in ['dire', 'file']

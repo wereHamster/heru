@@ -28,6 +28,9 @@ class spkg
     _.extend @, options
     @name = uri.host
 
+  deps: ->
+    return []
+
   verify: ->
     return run 'verify', @name
 
