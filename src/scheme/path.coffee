@@ -108,11 +108,13 @@ verifyPath = (path, options) ->
 
   return joinToFuture join, "Verification of #{path} failed"
 
+
 pathResource = (path) ->
   Resource = require 'resource'
   uri = url.parse "path:#{dirname(path)}"
   return new Resource null, uri,
-    type: 'dire', mode: 0644, user: 'root', group: 'wheel'
+    type: 'dire', mode: 0755, user: 'root', group: 'wheel'
+
 
 class Path
   constructor: (@resource, @uri, @options) ->

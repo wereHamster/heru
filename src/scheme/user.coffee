@@ -1,6 +1,7 @@
 
 { _ } = require 'underscore'
 { exec } = require 'child_process'
+url = require 'url'
 { to_html: render } = require 'mustache'
 Futures = require 'futures'
 
@@ -17,11 +18,13 @@ cmd = '''
   chown {{ login }}:{{ group }} {{ home }} && chmod 0700 {{ home }}
 '''
 
+
 # Generate an UID for the given login.
 hash = (login) ->
   _.reduce _.map(login.split(''), (c) ->
     c.charCodeAt(0) - 97
   ), (s, v) -> s + v
+
 
 class User
 
@@ -30,6 +33,16 @@ class User
 
     @login = uri.host
     @uid = 9000 + hash(@login)
+    @home ||= "/home/#{@login}"
+
+  deps: ->
+    Resource = require 'resource'
+
+    return [
+      new Resource null, url.parse("path:#{@home}"),
+        type: 'dire', mode: 0755, user: 'root', group: 'wheel'
+      ,
+    ]
 
   verify: ->
     future = Futures.future()
