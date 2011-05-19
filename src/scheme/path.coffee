@@ -7,35 +7,8 @@ existsSync = path.existsSync
 dirname = path.dirname
 { exec } = require 'child_process'
 Futures = require 'futures'
-{ joinToFuture } = require 'utils'
+{ expand, joinToFuture } = require 'utils'
 url = require 'url'
-
-expand = (path) ->
-  tokens = _.compact path.split /({|}|,)/
-
-  merge = (array, element) ->
-    (el + element) for el in array
-
-  collect = (tokens) ->
-    ret = []
-
-    current = [ '' ]
-    while token = tokens.shift()
-      if token == ','
-        ret.push current
-        current = [ '' ]
-      else if token == '{'
-        current = _.flatten(merge current, t for t in collect tokens)
-      else if token == '}'
-        break
-      else
-        current = merge current, token
-
-    ret.push current
-    return _.flatten(ret)
-
-  return collect tokens
-
 
 # Find the UID of the given login and invoken the callback with it.
 resolveUserID = (login, callback) ->
@@ -105,7 +78,7 @@ verifyPath = (path, options) ->
   join.add chown path, options.user, options.group
   join.add checkType path, options.type
 
-  return joinToFuture join, "Verification of #{path} failed"
+  return joinToFuture join, "path #{path}"
 
 
 Resource = null
@@ -132,7 +105,7 @@ class Path
 
     join = Futures.join()
     join.add verifyPath path, @options for path in @paths
-    return joinToFuture join, "Verification of #{@uri.pathname} failed"
+    return joinToFuture join, "scheme #{@uri.href}"
 
   amend: ->
     future = Futures.future()

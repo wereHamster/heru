@@ -53,7 +53,6 @@ class Node
 
     ret = checkIntegrity @resources
     @resources = topoSort _.map @resources, (v) -> v[0]
-    console.log _.map @resources, (res) -> res.uri.href
     return ret
 
   verify: ->
