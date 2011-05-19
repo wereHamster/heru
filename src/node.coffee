@@ -16,7 +16,8 @@ expandResources = (map, resources) ->
   for resource in resources
     for key in resource.decompose()
       map[key] = (map[key] || [])
-      map[key].push resource
+      unless _.any(map[key], (res) -> res.cmp resource)
+        map[key].push resource
 
     expandResources map, resource.deps()
 
@@ -42,6 +43,8 @@ checkIntegrity = (resourceMap) ->
         future.deliver null
 
       join.add future
+  else
+    join.add Futures.future().deliver null
 
   return joinToFuture join, "Integrity check failed"
 
@@ -51,11 +54,11 @@ class Node
     @manifests = (loadModule name for name in spec.manifests)
 
   init: ->
-    map = {}
+    @resources = {}
     for manifest in @manifests
-      expandResources map, _.values(manifest.resources)
+      expandResources @resources, _.values(manifest.resources)
 
-    return checkIntegrity map
+    return checkIntegrity @resources
 
   verify: ->
     return joinMethods.call @, @manifests, 'verify'

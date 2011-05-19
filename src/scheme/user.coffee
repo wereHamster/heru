@@ -28,28 +28,27 @@ hash = (login) ->
 
 class User
 
-  constructor: (@resource, uri, options) ->
-    _.extend @, options
+  constructor: (@resource, @uri, @options = {}) ->
+    @options.login = uri.host
 
-    @login = uri.host
-    @uid = 9000 + hash(@login)
-    @home ||= "/home/#{@login}"
+    @options.uid  ||= 9000 + hash(@options.login)
+    @options.home ||= "/home/#{@options.login}"
 
   deps: ->
     Resource = require 'resource'
 
     return [
-      new Resource null, url.parse("path:#{@home}"),
-        type: 'dire', mode: 0755, user: 'root', group: 'wheel'
+      new Resource null, url.parse("path:#{@options.home}"),
+        type: 'dire', mode: 0755, user: @options.login, group: 'wheel'
     ]
 
   verify: ->
     future = Futures.future()
-    exec "id -u #{@login}", (err, stdout, stderr) =>
+    exec "id -u #{@options.login}", (err, stdout, stderr) =>
       if err
         future.deliver err
-      else if @uid isnt parseInt stdout
-        console.log "#{@uid} - #{stdout}"
+      else if @options.uid isnt parseInt stdout
+        console.log "#{@options.uid} - #{stdout}"
         future.deliver new Error "User has incorrect UID"
       else
         future.deliver null
@@ -57,9 +56,13 @@ class User
 
   amend: ->
     future = Futures.future()
-    exec render(cmd, @), (err, stdout, stderr) =>
+    exec render(cmd, @options), (err, stdout, stderr) =>
       future.deliver err
     return future
+
+  cmp: (other) ->
+    return _.isEqual @options, other.options
+
 
 module.exports = User
 

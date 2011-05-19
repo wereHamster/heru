@@ -123,11 +123,7 @@ class Path
   deps: ->
     paths = _.select @paths, (path) -> path != '/'
     return [] if paths.length == 0
-
-    resources = _.map paths, pathResource
-    #resources.push new Resource null, url.parse('user:root')
-
-    return resources
+    return _.map paths, pathResource
 
   verify: ->
     unless @options.type in ['dire', 'file']
@@ -152,11 +148,7 @@ class Path
     return future
 
   cmp: (other) ->
-    return false if @options.type != other.options.type
-    return false if @options.mode != other.options.mode
-    return false if @options.user != other.options.user
-    return false if @options.group != other.options.group
-    return true
+    return _.isEqual @options, other.options
 
 
 module.exports = Path
