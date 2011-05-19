@@ -73,7 +73,7 @@ exports.topoSort = (resources) ->
 
     res.visited = true
     ideps = _.select resources, (r1) ->
-      return _.any r1.deps(), (r2) -> r2.cmp res
+      return _.any r1.deps(), (r2) -> r2.uri.href == res.uri.href
 
     L.push res
     visit m for m in ideps

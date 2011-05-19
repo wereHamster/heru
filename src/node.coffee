@@ -1,7 +1,7 @@
 
 { _ } = require 'underscore'
 Futures = require 'futures'
-{ joinToFuture, joinMethods, expandResources } = require 'utils'
+{ joinToFuture, joinMethods, expandResources, topoSort } = require 'utils'
 
 
 # Load the module and instanciate it. Pass it the base path so the module
@@ -14,20 +14,23 @@ loadModule = (name) ->
 # Check the integrity of the given manifsts. That is, deliver an error if
 # two or more manifests provide the same resource.
 checkIntegrity = (resourceMap) ->
-  # If a resource is priveded by more than one manifest, it's a conflict.
-  conflicts = _.select resourceMap, (v) ->
-    return v.length > 1
-
-  # Deliver one error for each conflict.
   join = Futures.join()
+
+  # If an URI is priveded by more than one resource, it's a potential
+  # conflict. Select those URIs.
+  conflicts = _.select resourceMap, (v) -> v.length > 1
+
+  # For each of those potential conflicts, check if the resources are
+  # compatible. If not, it's a real conflict.
   if conflicts.length > 0
     for key, resources of conflicts
       future = Futures.future()
 
-      filtered = _.filter resources, (res) -> !resources[0].cmp res
-      if filtered.length > 0
+      # Select the really distinct, incompatible resources.
+      distinct = _.filter resources, (res) -> !resources[0].cmp res
+      if distinct.length > 0
         href = resources[0].uri.href
-        count = filtered.length + 1
+        count = distinct.length + 1
         future.deliver new Error "#{href} provided by #{count} different resources"
       else
         future.deliver null
@@ -48,13 +51,16 @@ class Node
     for manifest in @manifests
       expandResources @resources, _.values(manifest.resources)
 
-    return checkIntegrity @resources
+    ret = checkIntegrity @resources
+    @resources = topoSort _.map @resources, (v) -> v[0]
+    console.log _.map @resources, (res) -> res.uri.href
+    return ret
 
   verify: ->
-    return joinMethods.call @, @manifests, 'verify'
+    return joinMethods.call @, @resources, 'verify'
 
   amend: ->
-    return joinMethods.call @, @manifests, 'amend'
+    return joinMethods.call @, @resources, 'amend'
 
 
 module.exports = Node

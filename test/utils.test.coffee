@@ -56,8 +56,8 @@ module.exports =
 
   'topoSort': ->
     list = [
+      new Resource(null, url.parse('path:/usr/bin'), {}),
       new Resource(null, url.parse('path:/usr'), {}),
-      new Resource(null, url.parse('path:/var'), {})
     ]
 
     map = {}
@@ -66,4 +66,6 @@ module.exports =
 
     assert.length L, 3
     assert.equal L[0].uri.href, 'path:/'
+    assert.equal L[1].uri.href, 'path:/usr'
+    assert.equal L[2].uri.href, 'path:/usr/bin'
 
