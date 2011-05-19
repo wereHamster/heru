@@ -38,6 +38,8 @@ checkFile = (file, mode, uid) ->
 runCommand = (cmd) ->
   future = Futures.future()
   exec cmd, (err, stdout, stderr) ->
+    if err
+      err.message = err.message.replace '\n', ''
     future.deliver err, stdout, stderr
   return future
 
