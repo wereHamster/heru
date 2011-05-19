@@ -48,7 +48,6 @@ dumpError = (err, indent = 0) ->
 # This is where it comes all together.
 node.init().when (err) ->
   if err
-    console.log 'Initialization failed.'
     return dumpError err
 
   node.verify().when (err) ->

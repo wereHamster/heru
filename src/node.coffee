@@ -10,32 +10,40 @@ loadModule = (name) ->
   path = require.resolve name + '/manifest'
   return new (require path)(path.replace '/manifest.coffee', '')
 
+
+# Expand the resources and store them in the map. This method is recursive.
+expandResources = (map, resources) ->
+  for resource in resources
+    for key in resource.decompose()
+      map[key] = (map[key] || [])
+      map[key].push resource
+
+    expandResources map, resource.deps()
+
 # Check the integrity of the given manifsts. That is, deliver an error if
 # two or more manifests provide the same resource.
-checkIntegrity = (manifests) ->
-  # Collect the resources which the manifests provide
-  resourceMap = {}
-  for manifest in manifests
-    for unused, resource of manifest.resources
-      for res in resource.decompose()
-        if resourceMap[res]
-          resourceMap[res].push res
-        else
-          resourceMap[res] = [ resource ]
-
+checkIntegrity = (resourceMap) ->
   # If a resource is priveded by more than one manifest, it's a conflict.
-  conflicts = _.select _.values(resourceMap), (e) ->
-    return e.length > 1
+  conflicts = _.select resourceMap, (v) ->
+    return v.length > 1
 
   # Deliver one error for each conflict.
-  future = Futures.future()
+  join = Futures.join()
   if conflicts.length > 0
-    for conflict in _.flatten conflicts
-      future.deliver new Error "Conflict in #{conflict}"
-  else
-    future.deliver null
+    for key, resources of conflicts
+      future = Futures.future()
 
-  return future
+      filtered = _.filter resources, (res) -> !resources[0].cmp res
+      if filtered.length > 0
+        href = resources[0].uri.href
+        count = filtered.length + 1
+        future.deliver new Error "#{href} provided by #{count} different resources"
+      else
+        future.deliver null
+
+      join.add future
+
+  return joinToFuture join, "Integrity check failed"
 
 
 class Node
@@ -43,7 +51,11 @@ class Node
     @manifests = (loadModule name for name in spec.manifests)
 
   init: ->
-    return checkIntegrity @manifests
+    map = {}
+    for manifest in @manifests
+      expandResources map, _.values(manifest.resources)
+
+    return checkIntegrity map
 
   verify: ->
     return joinMethods.call @, @manifests, 'verify'

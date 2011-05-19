@@ -23,6 +23,11 @@ class Resource
   decompose: ->
     return expand @uri.href
 
+  # Compare two resources, return a boolean indicating whether the two
+  # resources are compatible.
+  cmp: (other) ->
+    return false if @scheme.constructor != other.scheme.constructor
+    return @scheme.cmp other
 
 module.exports = Resource
 

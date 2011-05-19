@@ -41,7 +41,6 @@ class User
     return [
       new Resource null, url.parse("path:#{@home}"),
         type: 'dire', mode: 0755, user: 'root', group: 'wheel'
-      ,
     ]
 
   verify: ->
