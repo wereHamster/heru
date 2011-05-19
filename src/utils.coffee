@@ -47,8 +47,39 @@ exports.joinToFuture = joinToFuture = (join, msg) ->
 
   return future
 
+
 exports.joinMethods = (collection, method) ->
   join = Futures.join()
   join.add member[method]() for member in collection
   return joinToFuture join, "#{@constructor.name} '#{@name}' :: #{method}"
+
+
+# Expand the resources and store them in the map. This method is recursive.
+exports.expandResources = (map, resources) ->
+  for resource in resources
+    for key in resource.decompose()
+      map[key] = (map[key] || [])
+      unless _.any(map[key], (res) -> res.cmp resource)
+        map[key].push resource
+
+    exports.expandResources map, resource.deps()
+
+
+exports.topoSort = (resources) ->
+  L = []
+
+  visit = (res) ->
+    return if res.visited
+
+    res.visited = true
+    ideps = _.select resources, (r1) ->
+      return _.any r1.deps(), (r2) -> r2.cmp res
+
+    L.push res
+    visit m for m in ideps
+
+  S = _.select resources, (res) -> res.deps().length == 0
+  visit(res) for res in S
+
+  return L
 

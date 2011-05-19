@@ -2,8 +2,11 @@
 assert = require 'assert'
 Futures = require 'futures'
 
+{ _ } = require 'underscore'
+url = require 'url'
+Resource = require '../src/resource'
 { Utils } = require '../src/heru'
-{ expand, joinToFuture } = Utils
+{ expand, joinToFuture, expandResources, topoSort } = Utils
 
 module.exports =
   'a,b': ->
@@ -50,4 +53,17 @@ module.exports =
       assert.equal args[0].message, 'msg'
       assert.length args[0].children, 1
       assert.equal args[0].children[0].message, 'err'
+
+  'topoSort': ->
+    list = [
+      new Resource(null, url.parse('path:/usr'), {}),
+      new Resource(null, url.parse('path:/var'), {})
+    ]
+
+    map = {}
+    expandResources map, list
+    L = topoSort _.map map, (v) -> v[0]
+
+    assert.length L, 3
+    assert.equal L[0].uri.href, 'path:/'
 

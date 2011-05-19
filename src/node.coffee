@@ -1,7 +1,7 @@
 
 { _ } = require 'underscore'
 Futures = require 'futures'
-{ joinToFuture, joinMethods } = require 'utils'
+{ joinToFuture, joinMethods, expandResources } = require 'utils'
 
 
 # Load the module and instanciate it. Pass it the base path so the module
@@ -10,16 +10,6 @@ loadModule = (name) ->
   path = require.resolve name + '/manifest'
   return new (require path)(path.replace '/manifest.coffee', '')
 
-
-# Expand the resources and store them in the map. This method is recursive.
-expandResources = (map, resources) ->
-  for resource in resources
-    for key in resource.decompose()
-      map[key] = (map[key] || [])
-      unless _.any(map[key], (res) -> res.cmp resource)
-        map[key].push resource
-
-    expandResources map, resource.deps()
 
 # Check the integrity of the given manifsts. That is, deliver an error if
 # two or more manifests provide the same resource.
