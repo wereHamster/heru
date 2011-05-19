@@ -48,7 +48,6 @@ class User
       if err
         future.deliver err
       else if @options.uid isnt parseInt stdout
-        console.log "#{@options.uid} - #{stdout}"
         future.deliver new Error "User has incorrect UID"
       else
         future.deliver null
