@@ -88,7 +88,7 @@ pathResource = (path) ->
   Resource = require 'resource'
   uri = url.parse "path:#{dirname(path)}"
   return new Resource null, uri,
-    type: 'dire', mode: 0755, user: 'root', group: 'wheel'
+    type: 'dire', mode: 0755, user: 'root', group: 'root'
 
 
 class Path
