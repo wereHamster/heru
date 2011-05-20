@@ -114,8 +114,13 @@ class Path
 
     switch @options.type
       when 'dire'
-        fs.mkdir @paths[0], @options.mode, (err) ->
-          future.deliver err
+        path = @paths[0]
+        unless existsSync path
+          console.log "#{path} does not exist"
+          fs.mkdir @paths[0], @options.mode, (err) ->
+            future.deliver err
+        else
+          future.deliver null
       when 'file'
         func = @options.action.call @resource.manifest
         future = func.call @resource.manifest, @paths
