@@ -83,6 +83,30 @@ verifyPath = (path, options) ->
   return joinToFuture join, "path #{path}"
 
 
+createDirectory = (path) ->
+  future = Futures.future()
+  if existsSync path
+    future.deliver null
+  else
+    fs.mkdir path, 0700, (err) -> future.deliver err
+  return future
+
+
+amendDirectory = (path, options) ->
+  future = Futures.future()
+  createDirectory(path).when (err) ->
+    join = Futures.join()
+
+    join.add chmod path, options.mode
+    join.add chown path, options.user, options.group
+
+    join.when (err) ->
+      future.deliver err
+
+  return future
+  return joinToFuture join, "path #{path}"
+
+
 Resource = null
 pathResource = (path) ->
   Resource = require 'resource'
@@ -114,16 +138,15 @@ class Path
 
     switch @options.type
       when 'dire'
-        path = @paths[0]
-        unless existsSync path
-          console.log "#{path} does not exist"
-          fs.mkdir @paths[0], @options.mode, (err) ->
-            future.deliver err
-        else
-          future.deliver null
+        join = Futures.join()
+        join.add amendDirectory path, @options for path in @paths
+        future = joinToFuture join, "Paths: #{@paths}"
+
       when 'file'
         func = @options.action.call @resource.manifest
         future = func.call @resource.manifest, @paths
+      else
+        future.deliver new Error "Unknown type: #{@options.type}"
 
     return future
 
