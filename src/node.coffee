@@ -51,15 +51,22 @@ class Node
     for manifest in @manifests
       expandResources @resources, _.values(manifest.resources)
 
-    ret = checkIntegrity @resources
-    @resources = topoSort _.map @resources, (v) -> v[0]
-    return ret
+    return checkIntegrity @resources
 
   verify: ->
+    @resources = _.map @resources, (v) -> v[0]
     return joinMethods.call @, @resources, 'verify'
 
   amend: ->
-    return joinMethods.call @, @resources, 'amend'
+    @resources = topoSort @resources
+
+    resources = {}
+    for res in @resources
+      continue unless res.incomplete
+      console.log res.uri.href
+      resources[res.uri.href] = res
+
+    return joinMethods.call @, _.values(resources), 'amend'
 
 
 module.exports = Node
