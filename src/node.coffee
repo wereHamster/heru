@@ -46,6 +46,11 @@ class Node
   constructor: (@name, @spec)->
     @manifests = (loadModule name for name in spec.manifests)
 
+
+  # Initialize the node, make sure the resources in this node are consistent
+  # and not in conflict.
+  #
+  # @return future
   init: ->
     @resources = {}
     for manifest in @manifests
@@ -53,10 +58,19 @@ class Node
 
     return checkIntegrity @resources
 
+
+  # Verify the state of this node. If any resource fails to verify, deliver
+  # an error.
+  #
+  # @return future
   verify: ->
     @resources = _.map @resources, (v) -> v[0]
     return joinMethods.call @, @resources, 'verify'
 
+
+  # Fix any incomplete resources.
+  #
+  # @return future
   amend: ->
     @resources = topoSort @resources
 
