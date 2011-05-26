@@ -1,4 +1,5 @@
 
+Futures = require 'futures'
 schemeRegistry = require 'scheme'
 { expand, joinToFuture } = require 'utils'
 
@@ -13,7 +14,12 @@ class Resource
     return @scheme.deps()
 
   verify: ->
-    return @scheme.verify()
+    future = Futures.future()
+    @scheme.verify().when (err) =>
+      @incomplete = !!err
+      future.deliver err
+    return future
+
 
   amend: ->
     return @scheme.amend()
