@@ -36,8 +36,8 @@ to exist, have certain permissions and contents:
     { Manifest, Action } = require 'heru'
     class module.exports extends Manifest
 
-      'file:/etc/ssh/sshd_config': ->
-        perm: 0644, user: 'root', group: 'root', action: ->
+      'path:/etc/ssh/sshd_config': ->
+        type: 'file', mode: 0644, user: 'root', group: 'root', action: ->
           Action.Render 'sshd_config'
 
 If the file does not exist, heru will create it. The `Render` action takes the
