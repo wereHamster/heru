@@ -21,9 +21,8 @@ checkIntegrity = (resourceMap) ->
   _.each resourceMap, (v, k) ->
     conflicts[k] = v if v.length > 1
 
-  # For each of those potential conflicts, check if the resources are
-  # compatible. If not, it's a real conflict.
   if _.values(conflicts).length > 0
+    # For each of those conflicts, deliver an error.
     for key, resources of conflicts
       future = Futures.future()
 
@@ -33,6 +32,7 @@ checkIntegrity = (resourceMap) ->
 
       join.add future
   else
+    # No conflict, yay!
     join.add Futures.future().deliver null
 
   return joinToFuture join, "Integrity check failed"
@@ -41,7 +41,6 @@ checkIntegrity = (resourceMap) ->
 uniqueResources = (resources) ->
   map = {}
   for res in resources
-    continue unless res.incomplete
     map[res.uri.href] = res
 
   return _.values map
@@ -64,13 +63,13 @@ class Node
   # The verify stage iterates over all resources and and checks if they are
   # in their desired state. If not, an error is returned through the future.
   verify: ->
-    @resources = _.map @resources, (v, k) -> v[0]
+    @resources = uniqueResources _.map @resources, (v, k) -> v[0]
     return joinMethods.call @, @resources, 'verify'
 
 
   # Fix any incomplete resources.
   amend: ->
-    resources = topoSort uniqueResources @resources
+    resources = topoSort @resources
     return joinMethods.call @, resources, 'amend'
 
 
