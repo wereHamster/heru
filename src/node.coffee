@@ -16,24 +16,20 @@ loadModule = (name) ->
 checkIntegrity = (resourceMap) ->
   join = Futures.join()
 
-  # If an URI is priveded by more than one resource, it's a potential
-  # conflict. Select those URIs.
-  conflicts = _.select resourceMap, (v) -> v.length > 1
+  # If an URI is priveded by more than one resource, it's a conflict.
+  conflicts = {}
+  _.each resourceMap, (v, k) ->
+    conflicts[k] = v if v.length > 1
 
   # For each of those potential conflicts, check if the resources are
   # compatible. If not, it's a real conflict.
-  if conflicts.length > 0
+  if _.values(conflicts).length > 0
     for key, resources of conflicts
       future = Futures.future()
 
-      # Select the really distinct, incompatible resources.
-      distinct = _.filter resources, (res) -> !resources[0].cmp res
-      if distinct.length > 0
-        href = resources[0].uri.href
-        count = distinct.length + 1
-        future.deliver new Error "#{href} provided by #{count} different resources"
-      else
-        future.deliver null
+      # Maybe we could print the manifests which provided those resources?
+      count = resources.length
+      future.deliver new Error "#{key} provided by #{count} different resources"
 
       join.add future
   else
@@ -42,6 +38,14 @@ checkIntegrity = (resourceMap) ->
   return joinToFuture join, "Integrity check failed"
 
 
+uniqueResources = (resources) ->
+  map = {}
+  for res in resources
+    continue unless res.incomplete
+    map[res.uri.href] = res
+
+  return _.values map
+
 class Node
   constructor: (@name, @spec)->
     @manifests = (loadModule name for name in spec.manifests)
@@ -49,8 +53,6 @@ class Node
 
   # Initialize the node, make sure the resources in this node are consistent
   # and not in conflict.
-  #
-  # @return future
   init: ->
     @resources = {}
     for manifest in @manifests
@@ -59,28 +61,17 @@ class Node
     return checkIntegrity @resources
 
 
-  # Verify the state of this node. If any resource fails to verify, deliver
-  # an error.
-  #
-  # @return future
+  # The verify stage iterates over all resources and and checks if they are
+  # in their desired state. If not, an error is returned through the future.
   verify: ->
-    @resources = _.map @resources, (v) -> v[0]
+    @resources = _.map @resources, (v, k) -> v[0]
     return joinMethods.call @, @resources, 'verify'
 
 
   # Fix any incomplete resources.
-  #
-  # @return future
   amend: ->
-    @resources = topoSort @resources
-
-    resources = {}
-    for res in @resources
-      continue unless res.incomplete
-      console.log res.uri.href
-      resources[res.uri.href] = res
-
-    return joinMethods.call @, _.values(resources), 'amend'
+    resources = topoSort uniqueResources @resources
+    return joinMethods.call @, resources, 'amend'
 
 
 module.exports = Node
