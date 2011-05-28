@@ -25,9 +25,10 @@ class Resource
     @scheme = new scheme @, @uri, @options
 
 
-  # Methods forwarded to the scheme.
+  # Methods forwarded to the scheme. Result is cached.
   deps: ->
-    return uniqueResources @scheme.deps()
+    @deps = _.once -> uniqueResources @scheme.deps()
+    return @deps()
 
   verify: ->
     future = Futures.future()
