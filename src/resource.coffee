@@ -1,7 +1,23 @@
 
+{ _ } = require 'underscore'
 Futures = require 'futures'
 schemeRegistry = require 'scheme'
 { expand, joinToFuture } = require 'utils'
+
+
+# Check whether the list includes the given resource. It uses Resource#cmp
+# to compare the resources.
+includesResource = (list, res) ->
+  return _.any list, (r) -> return r.cmp res
+
+
+# Return a list of unique resources.
+uniqueResources = (resources) ->
+  ret = []
+  for res in resources
+    ret.push(res) unless includesResource ret, res
+  return ret
+
 
 class Resource
   constructor: (@manifest, @uri, @options) ->
@@ -11,7 +27,7 @@ class Resource
 
   # Methods forwarded to the scheme.
   deps: ->
-    return @scheme.deps()
+    return uniqueResources @scheme.deps()
 
   verify: ->
     future = Futures.future()
