@@ -30,6 +30,7 @@ class Resource
     @deps = _.once -> uniqueResources @scheme.deps()
     return @deps()
 
+
   verify: ->
     future = Futures.future()
     @scheme.verify().when (err) =>
@@ -44,7 +45,9 @@ class Resource
 
   # Helper methods which the resource can use.
   decompose: ->
-    return expand @uri.href
+    @decompose = _.once -> expand @uri.href
+    return @decompose()
+
 
   # Compare two resources, return a boolean indicating whether the two
   # resources are compatible.
