@@ -121,7 +121,7 @@ class Path
 
   deps: ->
     paths = _.select @paths, (path) -> path != '/'
-    return [] if paths.length == 0
+    return paths if paths.length == 0
     return _.map paths, pathResource
 
   verify: ->
@@ -143,6 +143,7 @@ class Path
       when 'file'
         func = @options.action.call @resource.manifest
         future = func.call @resource.manifest, @paths
+
       else
         future.deliver new Error "Unknown type: #{@options.type}"
 

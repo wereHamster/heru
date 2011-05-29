@@ -45,6 +45,46 @@ uniqueResources = (resources) ->
 
   return _.values map
 
+amendResource = (dispatchTable, resource) ->
+  resource.amend().when (err) ->
+    dispatchTable[resource.uri.href].deliver err
+  return dispatchTable[resource.uri.href]
+
+
+# Generate a dispatch table where keys are resource URIs and values are
+# futere objects which can be delivered to.
+futureDispatchTable = (resources) ->
+  ret = {}
+  for res in resources
+    ret[res.uri.href] = Futures.future()
+  return ret
+
+
+topologyDispatch = (resources) ->
+  dispatchTable = futureDispatchTable resources
+  ret = Futures.join()
+
+  for res in resources
+    if res.deps().length == 0
+      # Resources without dependencies can be added directly to ret
+      ret.add amendResource dispatchTable, res
+    else
+      # Wait for all dependencies to be fulfilled
+      join = Futures.join()
+      join.add dispatchTable[dep.uri.href] for dep in res.deps()
+
+      future = joinToFuture join, null #"Dependencies of #{res.uri.href} failed"
+      ret.add future
+
+      doWhen = (lres) ->
+        return (err) ->
+          amendResource dispatchTable, lres
+
+      future.when doWhen(res)
+
+  return joinToFuture ret, "topologyDispatch failed"
+
+
 class Node
   constructor: (@name, @spec)->
     @manifests = (loadModule name for name in spec.manifests)
@@ -69,8 +109,7 @@ class Node
 
   # Fix any incomplete resources.
   amend: ->
-    resources = topoSort @resources
-    return joinMethods.call @, resources, 'amend'
+    return topologyDispatch @resources
 
 
 module.exports = Node

@@ -36,7 +36,7 @@ exports.joinToFuture = joinToFuture = (join, msg) ->
   join.when ->
     args = Array.prototype.slice.call arguments
     errors = _.compact _.map args, (e) -> e[0]
-    if errors.length > 0
+    if msg and errors.length > 0
       error = new Error msg
       error.children = errors
       future.deliver error
