@@ -100,11 +100,11 @@ amendDirectory = (path, options) ->
     join.add chmod path, options.mode
     join.add chown path, options.user, options.group
 
-    join.when (err) ->
+    tmp = joinToFuture join, "path #{path}"
+    tmp.when (err) ->
       future.deliver err
 
   return future
-  return joinToFuture join, "path #{path}"
 
 
 Resource = null
@@ -138,9 +138,7 @@ class Path
 
     switch @options.type
       when 'dire'
-        join = Futures.join()
-        join.add amendDirectory path, @options for path in @paths
-        future = joinToFuture join, "Paths: #{@paths}"
+        future = amendDirectory path, @options for path in @paths
 
       when 'file'
         func = @options.action.call @resource.manifest
