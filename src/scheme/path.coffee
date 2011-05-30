@@ -119,10 +119,11 @@ class Path
   constructor: (@resource, @uri, @options) ->
     @paths = expand @uri.pathname
 
+
   deps: ->
     paths = _.select @paths, (path) -> path != '/'
-    return paths if paths.length == 0
     return _.map paths, pathResource
+
 
   verify: ->
     unless @options.type in ['dire', 'file']
@@ -132,6 +133,7 @@ class Path
     join = Futures.join()
     join.add verifyPath path, @options for path in @paths
     return joinToFuture join, "scheme #{@uri.href}"
+
 
   amend: ->
     future = Futures.future()
