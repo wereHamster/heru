@@ -83,3 +83,9 @@ exports.topoSort = (resources) ->
 
   return L
 
+
+exports.idHash = (str) ->
+  return _.reduce _.map(str.split(''), (c) ->
+    c.charCodeAt(0) - 97
+  ), (s, v) -> s + v
+

@@ -4,6 +4,7 @@
 url = require 'url'
 { to_html: render } = require 'mustache'
 Futures = require 'futures'
+{ idHash } = require 'utils'
 
 
 # Command to create or update the user.
@@ -11,13 +12,6 @@ cmd = '''
   ( id "{{ name }}" 1>/dev/null 2>&1 || useradd "{{ name }}" ) &&
   usermod -L -u "{{ uid }}" -g "{{ group }}" -d "{{ home }}" "{{ name }}";
 '''
-
-
-# Generate an UID for the given login.
-hash = (login) ->
-  _.reduce _.map(login.split(''), (c) ->
-    c.charCodeAt(0) - 97
-  ), (s, v) -> s + v
 
 uidBase =
   'daemon': 9000
@@ -28,7 +22,7 @@ class User
     @options.name = uri.host
 
     base = uidBase[@options.group || 'daemon']
-    @options.uid  ||= base + hash(@options.name)
+    @options.uid  ||= base + idHash(@options.name)
     @options.home ||= "/home/#{@options.name}"
 
   deps: ->
