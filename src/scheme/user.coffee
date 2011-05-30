@@ -35,7 +35,7 @@ class User
 
   verify: ->
     future = Futures.future()
-    exec "id -u #{@options.login}", (err, stdout, stderr) =>
+    exec "id -u #{@options.name}", (err, stdout, stderr) =>
       if err
         future.deliver err
       else if @options.uid isnt parseInt stdout
