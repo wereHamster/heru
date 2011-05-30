@@ -25,13 +25,16 @@ hash = (login) ->
     c.charCodeAt(0) - 97
   ), (s, v) -> s + v
 
+uidBase =
+  'daemon': 9000
 
 class User
 
   constructor: (@resource, @uri, @options = {}) ->
     @options.login = uri.host
 
-    @options.uid  ||= 9000 + hash(@options.login)
+    base = uidBase[@options.group || 'daemon']
+    @options.uid  ||= base + hash(@options.login)
     @options.home ||= "/home/#{@options.login}"
 
   deps: ->
