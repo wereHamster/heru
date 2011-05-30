@@ -65,6 +65,10 @@ topologyDispatch = (resources) ->
   ret = Futures.join()
 
   for res in resources
+    unless res.incomplete
+      dispatchTable[res.uri.href].deliver null
+      continue
+
     if res.deps().length == 0
       # Resources without dependencies can be added directly to ret
       ret.add amendResource dispatchTable, res
