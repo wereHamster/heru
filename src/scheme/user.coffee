@@ -6,16 +6,10 @@ url = require 'url'
 Futures = require 'futures'
 
 
-# Command to check, create and update the user. It is ugly, because it's
-# nothing more than a shell script which we run. Unfortunately there is no
-# native interface to the user or group databases in nodejs, so that's the
-# only choice we have.
+# Command to create or update the user.
 cmd = '''
-  ( id {{ login }} 1>/dev/null 2>&1 || useradd {{ login }} ) &&
-  usermod -L -u {{ uid }} -g {{ group }} -d {{ home }} {{ login }};
-
-  test -d {{ home }} || mkdir -p {{ home }}
-  chown {{ login }}:{{ group }} {{ home }} && chmod 0700 {{ home }}
+  ( id "{{ name }}" 1>/dev/null 2>&1 || useradd "{{ name }}" ) &&
+  usermod -L -u "{{ uid }}" -g "{{ group }}" -d "{{ home }}" "{{ name }}";
 '''
 
 
@@ -31,18 +25,18 @@ uidBase =
 class User
 
   constructor: (@resource, @uri, @options = {}) ->
-    @options.login = uri.host
+    @options.name = uri.host
 
     base = uidBase[@options.group || 'daemon']
-    @options.uid  ||= base + hash(@options.login)
-    @options.home ||= "/home/#{@options.login}"
+    @options.uid  ||= base + hash(@options.name)
+    @options.home ||= "/home/#{@options.name}"
 
   deps: ->
     Resource = require 'resource'
 
     return [
       new Resource null, url.parse("path:#{@options.home}"),
-        type: 'dire', mode: 0755, user: @options.login, group: 'wheel'
+        type: 'dire', mode: 0755, user: @options.name, group: 'wheel'
     ]
 
   verify: ->
