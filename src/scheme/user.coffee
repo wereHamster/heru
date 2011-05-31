@@ -34,6 +34,9 @@ class User
         type: 'dire', mode: 0755, user: @options.name, group: 'wheel'
     ]
 
+  post: ->
+    return []
+
   verify: ->
     future = Futures.future()
     exec "id -u #{@options.name}", (err, stdout, stderr) =>

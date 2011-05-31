@@ -26,6 +26,9 @@ class Group
   deps: ->
     return []
 
+  post: ->
+    return []
+
 
   verify: ->
     future = Futures.future()

@@ -31,6 +31,9 @@ class spkg
   deps: ->
     return []
 
+  post: ->
+    return []
+
   verify: ->
     return run 'verify', @name
 

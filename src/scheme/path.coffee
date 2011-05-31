@@ -124,6 +124,9 @@ class Path
     paths = _.select @paths, (path) -> path != '/'
     return _.map paths, pathResource
 
+  post: ->
+    return []
+
 
   verify: ->
     unless @options.type in ['dire', 'file']

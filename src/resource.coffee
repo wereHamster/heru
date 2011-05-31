@@ -30,6 +30,11 @@ class Resource
     @deps = _.once -> uniqueResources @scheme.deps()
     return @deps()
 
+  # Resources to be created after this one is completed.
+  post: ->
+    @post = _.once -> uniqueResources @scheme.post()
+    return @post()
+
 
   verify: ->
     future = Futures.future()
