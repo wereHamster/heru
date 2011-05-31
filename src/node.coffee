@@ -101,6 +101,10 @@ class Node
     for manifest in @manifests
       expandResources @resources, _.values(manifest.resources)
 
+      for resource in _.values(manifest.resources)
+        expandResources @resources, resource.deps()
+        expandResources @resources, resource.post()
+
     return checkIntegrity @resources
 
 
