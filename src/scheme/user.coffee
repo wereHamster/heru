@@ -14,6 +14,7 @@ cmd = '''
 '''
 
 uidBase =
+  'staff' : 1000
   'daemon': 9000
 
 class User
