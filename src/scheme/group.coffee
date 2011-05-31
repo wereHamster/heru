@@ -4,7 +4,6 @@
 url = require 'url'
 { to_html: render } = require 'mustache'
 Futures = require 'futures'
-{ idHash } = require 'utils'
 
 
 # Command to create or update the group.
@@ -22,7 +21,6 @@ class Group
 
   constructor: (@resource, @uri, @options = {}) ->
     @options.name = uri.host
-    @options.gid  ||= 1000 + idHash(@options.name)
 
 
   deps: ->
@@ -34,8 +32,8 @@ class Group
     exec "grep {{ @options.name }} /etc/group | cut -f3 -d:", (err, stdout, stderr) =>
       if err
         future.deliver err
-      else if @options.gid isnt parseInt stdout
-        future.deliver new Error "Group {{ @options.name }} has incorrect GID"
+      else if @options.gid and @options.gid isnt parseInt stdout
+        future.deliver new Error "Group #{@options.name} has incorrect GID"
       else
         future.deliver null
     return future
