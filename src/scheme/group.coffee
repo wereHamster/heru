@@ -19,7 +19,7 @@ cmd = '''
 
 class Group
 
-  constructor: (@resource, @uri, @options = {}) ->
+  constructor: (@resource, @uri, @options) ->
     @options.name = uri.host
 
 
@@ -29,6 +29,8 @@ class Group
   post: ->
     return []
 
+  weak: ->
+    return _.keys(@options).length == 1
 
   verify: ->
     future = Futures.future()

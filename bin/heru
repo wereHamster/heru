@@ -28,8 +28,8 @@ loadNode = (hostname) ->
 
 # There is no way to get the FQDN in node. The user needs to supply the
 # hostname on the commandline.
-spec = loadNode process.argv[2]
-node = new heru.Node process.argv[2], spec
+spec = loadNode process.argv[process.argv.length - 1]
+node = new heru.Node process.argv[process.argv.length - 1], spec
 
 ind = (indent) ->
   a = []
@@ -52,10 +52,14 @@ node.init().when (err) ->
 
   node.verify().when (err) ->
     if err
-      console.log 'Node is in incomplete state. Taking corrective measures.'
-      dumpError err
-      node.amend().when (err) ->
-        dumpError err if err
+      if '--dry-run' in process.argv
+        console.log "dry run mode"
+        dumpError err
+      else
+        console.log 'Node is in incomplete state. Taking corrective measures.'
+        dumpError err
+        node.amend().when (err) ->
+          dumpError err if err
     else
       console.log 'Node verified. Nothing to do'
 

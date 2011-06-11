@@ -19,23 +19,32 @@ uidBase =
 
 class User
 
-  constructor: (@resource, @uri, @options = {}) ->
+  constructor: (@resource, @uri, @options) ->
     @options.name = uri.host
 
     base = uidBase[@options.group || 'daemon']
-    @options.uid  ||= base + idHash(@options.name)
-    @options.home ||= "/home/#{@options.name}"
+    @options.uid = base + idHash(@options.name) unless @options.uid?
+    @options.home = "/home/#{@options.name}" unless @options.home?
+
 
   deps: ->
     Resource = require 'resource'
+    group = new Resource null, url.parse("group:#{@options.name}"),
+      gid: @options.uid
 
-    return [
-      new Resource null, url.parse("path:#{@options.home}"),
-        type: 'dire', mode: 0755, user: @options.name, group: 'wheel'
-    ]
+    return [ group ] unless @options.weak
+    return []
 
   post: ->
+    Resource = require 'resource'
+    homeDir = new Resource null, url.parse("path:#{@options.home}"),
+      type: 'dire', mode: 2700, user: @options.name, group: @options.name
+
+    return [ homeDir ] unless @options.weak
     return []
+
+  weak: ->
+    return @options.weak
 
   verify: ->
     future = Futures.future()

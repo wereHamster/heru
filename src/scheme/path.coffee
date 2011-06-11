@@ -122,11 +122,16 @@ class Path
 
   deps: ->
     paths = _.select @paths, (path) -> path != '/'
-    return _.map paths, pathResource
+    paths = _.map paths, pathResource
+    paths.push new Resource null, url.parse("group:#{@options.group}")
+    paths.push new Resource null, url.parse("user:#{@options.user}")
+    return paths
 
   post: ->
     return []
 
+  weak: ->
+    return false
 
   verify: ->
     unless @options.type in ['dire', 'file']

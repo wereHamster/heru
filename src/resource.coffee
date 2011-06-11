@@ -20,7 +20,7 @@ uniqueResources = (resources) ->
 
 
 class Resource
-  constructor: (@manifest, @uri, @options) ->
+  constructor: (@manifest, @uri, @options = {}) ->
     scheme = schemeRegistry[@uri.protocol.replace ':', '']
     @scheme = new scheme @, @uri, @options
 
@@ -35,6 +35,9 @@ class Resource
     @post = _.once -> uniqueResources @scheme.post()
     return @post()
 
+  weak: ->
+    @weak = _.once -> @scheme.weak()
+    return @weak()
 
   verify: ->
     future = Futures.future()

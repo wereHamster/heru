@@ -77,16 +77,25 @@ topologyDispatch = (resources) ->
       join = Futures.join()
       join.add dispatchTable[dep.uri.href] for dep in res.deps()
 
-      future = joinToFuture join, null #"Dependencies of #{res.uri.href} failed"
+      console.log 'join to future'
+      future = joinToFuture join, null # "Dependencies of #{res.uri.href} failed"
       ret.add future
 
       doWhen = (lres) ->
         return (err) ->
           amendResource dispatchTable, lres
 
+      console.log 'when'
       future.when doWhen(res)
 
   return joinToFuture ret, "topologyDispatch failed"
+
+removeWeakResources = (resources) ->
+  for res, index in resources
+    continue unless res
+    if res.weak()
+      console.log "Removing weak resource #{res.uri.href} #{index}"
+      resources.splice(index, index)
 
 
 class Node
@@ -104,6 +113,11 @@ class Node
       for resource in _.values(manifest.resources)
         expandResources @resources, resource.deps()
         expandResources @resources, resource.post()
+
+    # Filter out weak resources
+    for uri, resources of @resources
+      console.log "#{uri}: #{resources.length}"
+      removeWeakResources resources
 
     return checkIntegrity @resources
 
