@@ -29,7 +29,7 @@ class User
 
   deps: ->
     Resource = require 'resource'
-    group = new Resource null, url.parse("group:#{@options.name}"),
+    group = new Resource url.parse("group:#{@options.name}"),
       gid: @options.uid
 
     return [ group ] unless @options.weak
@@ -37,7 +37,7 @@ class User
 
   post: ->
     Resource = require 'resource'
-    homeDir = new Resource null, url.parse("path:#{@options.home}"),
+    homeDir = new Resource url.parse("path:#{@options.home}"),
       type: 'dire', mode: 2700, user: @options.name, group: @options.name
 
     return [ homeDir ] unless @options.weak

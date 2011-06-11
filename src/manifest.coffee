@@ -13,7 +13,7 @@ class Manifest
     @resources = { }
     for uri, initializer of @constructor.prototype
       continue if uri == 'constructor' or uri in _.keys Manifest.prototype
-      @resources[uri] = new Resource @, url.parse(uri), initializer()
+      @resources[uri] = new Resource url.parse(uri), initializer()
 
   bootstrap: ->
     future = Futures.future()

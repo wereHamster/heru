@@ -20,7 +20,7 @@ uniqueResources = (resources) ->
 
 
 class Resource
-  constructor: (@manifest, @uri, @options = {}) ->
+  constructor: (@uri, @options = {}) ->
     scheme = schemeRegistry[@uri.protocol.replace ':', '']
     @scheme = new scheme @, @uri, @options
 
