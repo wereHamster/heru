@@ -121,8 +121,9 @@ class Path
   deps: ->
     paths = _.select @paths, (path) -> path != '/'
     paths = _.map paths, pathResource
-    paths.push new Resource "group:#{@options.group || 'root'}", { weak: true }
-    paths.push new Resource "user:#{@options.user || 'root'}", { weak: true }
+    unless @options.weak
+      paths.push new Resource "group:#{@options.group || 'root'}", { weak: true }
+      paths.push new Resource "user:#{@options.user}", { weak: true }
     return paths
 
   post: ->
