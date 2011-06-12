@@ -34,7 +34,7 @@ class Group
 
   verify: ->
     future = Futures.future()
-    exec "grep {{ @options.name }} /etc/group | cut -f3 -d:", (err, stdout, stderr) =>
+    exec "grep #{@options.name} /etc/group | cut -f3 -d:", (err, stdout, stderr) =>
       if err
         future.deliver err
       else if @options.gid and @options.gid isnt parseInt stdout
