@@ -110,8 +110,7 @@ amendDirectory = (path, options) ->
 Resource = null
 pathResource = (path) ->
   Resource = require 'resource'
-  uri = url.parse "path:#{dirname(path)}"
-  return new Resource uri,
+  return new Resource url.parse("path:#{dirname(path)}"),
     type: 'dire', mode: 0755, user: 'root', group: 'root'
 
 
@@ -123,8 +122,8 @@ class Path
   deps: ->
     paths = _.select @paths, (path) -> path != '/'
     paths = _.map paths, pathResource
-    paths.push new Resource url.parse("group:#{@options.group}")
-    paths.push new Resource url.parse("user:#{@options.user}")
+    paths.push new Resource url.parse("group:#{@options.group || 'root'}"), { weak: true }
+    paths.push new Resource url.parse("user:#{@options.user || 'root'}"), { weak: true }
     return paths
 
   post: ->

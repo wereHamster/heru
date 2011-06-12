@@ -24,9 +24,8 @@ run = (method, name) ->
 
 class spkg
 
-  constructor: (@resource, uri, options) ->
-    _.extend @, options
-    @name = uri.host
+  constructor: (@resource, @uri, @options) ->
+    @options.name = uri.host
 
   deps: ->
     return []

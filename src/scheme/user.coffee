@@ -30,18 +30,16 @@ class User
   deps: ->
     Resource = require 'resource'
     group = new Resource url.parse("group:#{@options.name}"),
-      gid: @options.uid
+      weak: @options.weak, gid: @options.uid
 
     return [ group ] unless @options.weak
-    return []
 
   post: ->
     Resource = require 'resource'
     homeDir = new Resource url.parse("path:#{@options.home}"),
-      type: 'dire', mode: 2700, user: @options.name, group: @options.name
+      weak: true, type: 'dire', mode: 2700, user: @options.name, group: @options.name
 
     return [ homeDir ] unless @options.weak
-    return []
 
   weak: ->
     return @options.weak
@@ -52,7 +50,7 @@ class User
       if err
         future.deliver err
       else if @options.uid isnt parseInt stdout
-        future.deliver new Error "User has incorrect UID"
+        future.deliver new Error "User #{@options.name} has incorrect UID"
       else
         future.deliver null
     return future

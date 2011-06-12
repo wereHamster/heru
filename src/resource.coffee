@@ -20,18 +20,21 @@ uniqueResources = (resources) ->
 
 
 class Resource
-  constructor: (@uri, @options = {}) ->
+  constructor: (@uri, @options = { }) ->
+    @options.weak = false unless @options.weak?
     scheme = schemeRegistry[@uri.protocol.replace ':', '']
     @scheme = new scheme @, @uri, @options
 
 
   # Methods forwarded to the scheme. Result is cached.
   deps: ->
+    return [] if @options.weak
     @deps = _.once -> uniqueResources @scheme.deps()
     return @deps()
 
   # Resources to be created after this one is completed.
   post: ->
+    return [] if @options.weak
     @post = _.once -> uniqueResources @scheme.post()
     return @post()
 

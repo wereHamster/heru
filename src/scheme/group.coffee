@@ -30,7 +30,7 @@ class Group
     return []
 
   weak: ->
-    return _.keys(@options).length == 1
+    return @options.weak
 
   verify: ->
     future = Futures.future()
