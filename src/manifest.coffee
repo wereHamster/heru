@@ -1,6 +1,5 @@
 
 { _ } = require 'underscore'
-url = require 'url'
 render = require('mustache').to_html
 Futures = require 'futures'
 { joinToFuture, joinMethods } = require 'utils'
@@ -13,7 +12,7 @@ class Manifest
     @resources = { }
     for uri, initializer of @constructor.prototype
       continue if uri == 'constructor' or uri in _.keys Manifest.prototype
-      @resources[uri] = new Resource url.parse(uri), initializer()
+      @resources[uri] = new Resource uri, initializer()
 
   bootstrap: ->
     future = Futures.future()

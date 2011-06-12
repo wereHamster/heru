@@ -3,7 +3,7 @@
 Futures = require 'futures'
 schemeRegistry = require 'scheme'
 { expand, joinToFuture } = require 'utils'
-
+url = require 'url'
 
 # Check whether the list includes the given resource. It uses Resource#cmp
 # to compare the resources.
@@ -20,7 +20,9 @@ uniqueResources = (resources) ->
 
 
 class Resource
-  constructor: (@uri, @options = { }) ->
+  constructor: (uri, @options = { }) ->
+    @uri = url.parse uri
+
     @options.weak = false unless @options.weak?
     scheme = schemeRegistry[@uri.protocol.replace ':', '']
     @scheme = new scheme @, @uri, @options

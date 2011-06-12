@@ -1,7 +1,6 @@
 
 { _ } = require 'underscore'
 { exec } = require 'child_process'
-url = require 'url'
 { to_html: render } = require 'mustache'
 Futures = require 'futures'
 { idHash } = require 'utils'
@@ -29,14 +28,14 @@ class User
 
   deps: ->
     Resource = require 'resource'
-    group = new Resource url.parse("group:#{@options.name}"),
+    group = new Resource "group:#{@options.name}",
       weak: @options.weak, gid: @options.uid
 
     return [ group ] unless @options.weak
 
   post: ->
     Resource = require 'resource'
-    homeDir = new Resource url.parse("path:#{@options.home}"),
+    homeDir = new Resource "path:#{@options.home}",
       weak: true, type: 'dire', mode: 2700, user: @options.name, group: @options.name
 
     return [ homeDir ] unless @options.weak

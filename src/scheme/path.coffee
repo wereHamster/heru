@@ -8,7 +8,6 @@ dirname = path.dirname
 { exec } = require 'child_process'
 Futures = require 'futures'
 { expand, joinToFuture } = require 'utils'
-url = require 'url'
 
 # Find the UID of the given login and invoken the callback with it.
 resolveUserID = (login, callback) ->
@@ -110,7 +109,7 @@ amendDirectory = (path, options) ->
 Resource = null
 pathResource = (path) ->
   Resource = require 'resource'
-  return new Resource url.parse("path:#{dirname(path)}"),
+  return new Resource "path:#{dirname(path)}",
     type: 'dire', mode: 0755, user: 'root', group: 'root'
 
 
@@ -122,8 +121,8 @@ class Path
   deps: ->
     paths = _.select @paths, (path) -> path != '/'
     paths = _.map paths, pathResource
-    paths.push new Resource url.parse("group:#{@options.group || 'root'}"), { weak: true }
-    paths.push new Resource url.parse("user:#{@options.user || 'root'}"), { weak: true }
+    paths.push new Resource "group:#{@options.group || 'root'}", { weak: true }
+    paths.push new Resource "user:#{@options.user || 'root'}", { weak: true }
     return paths
 
   post: ->
