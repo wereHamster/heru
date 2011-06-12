@@ -122,7 +122,7 @@ class Path
     paths = _.select @paths, (path) -> path != '/'
     paths = _.map paths, pathResource
     unless @options.weak
-      paths.push new Resource "group:#{@options.group || 'root'}", { weak: true }
+      paths.push new Resource "group:#{@options.group}", { weak: true }
       paths.push new Resource "user:#{@options.user}", { weak: true }
     return paths
 

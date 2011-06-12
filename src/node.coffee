@@ -56,35 +56,31 @@ amendResource = (dispatchTable, resource) ->
 futureDispatchTable = (resources) ->
   ret = {}
   for res in resources
-    ret[res.uri.href] = Futures.future()
+    ret[res.uri.href] = { future: Futures.future(), join: Futures.join() }
   return ret
 
 
 topologyDispatch = (resources) ->
-  dispatchTable = futureDispatchTable resources
+  dispatchTable = futureDispatchTable()
+
   ret = Futures.join()
+  addRet = (res, future) ->
+    dispatchTable[res.uri.href].join.add future
+    ret.add future
 
   for res in resources
-    unless res.incomplete
-      dispatchTable[res.uri.href].deliver null
-      continue
+    for dep in res.deps()
+      addRet res, dispatchTable[dep.uri.href].future
 
+    for post in res.post()
+      addRet post, dispatchTable[res.uri.href].future
+
+  for res in resources
     if res.deps().length == 0
-      # Resources without dependencies can be added directly to ret
-      ret.add amendResource dispatchTable, res
-    else
-      # Wait for all dependencies to be fulfilled
-      join = Futures.join()
-      join.add dispatchTable[dep.uri.href] for dep in res.deps()
+      dispatchTable[res.uri.href].future.deliver null
 
-      future = joinToFuture join, null # "Dependencies of #{res.uri.href} failed"
-      ret.add future
-
-      doWhen = (lres) ->
-        return (err) ->
-          amendResource dispatchTable, lres
-
-      future.when doWhen(res)
+    dispatchTable[res.uri.href].join.when (err) ->
+      ((r) -> amendResource dispatchTable, r)(res)
 
   return joinToFuture ret, "topologyDispatch failed"
 
