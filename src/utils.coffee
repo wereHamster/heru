@@ -66,25 +66,6 @@ exports.expandResources = (map, resources) ->
     exports.expandResources map, resource.deps()
 
 
-exports.topoSort = (resources) ->
-  L = []
-
-  visit = (res) ->
-    return if res.visited
-
-    res.visited = true
-    ideps = _.select resources, (r1) ->
-      return _.any r1.deps(), (r2) -> r2.uri.href == res.uri.href
-
-    L.push res
-    visit m for m in ideps
-
-  S = _.select resources, (res) -> res.deps().length == 0
-  visit(res) for res in S
-
-  return L
-
-
 exports.idHash = (str) ->
   return _.reduce _.map(str.split(''), (c) ->
     c.charCodeAt(0) - 97
