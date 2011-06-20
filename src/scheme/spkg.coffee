@@ -30,7 +30,7 @@ class spkg
   deps: ->
     return []
 
-  post: ->
+  siblings: ->
     return []
 
   verify: ->

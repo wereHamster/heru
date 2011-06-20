@@ -26,7 +26,7 @@ class Group
   deps: ->
     return []
 
-  post: ->
+  siblings: ->
     return []
 
   verify: ->

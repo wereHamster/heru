@@ -70,7 +70,7 @@ exports.expandResources = (map, resources) ->
         map[key] = null
 
     if (n > 0)
-      exports.expandResources map, resource.post()
+      exports.expandResources map, resource.siblings()
 
 
 exports.idHash = (str) ->

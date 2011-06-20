@@ -119,10 +119,10 @@ class Path
 
 
   deps: ->
-    paths = _.map @post(), (res) -> res.uri.href
+    paths = _.map @siblings(), (res) -> res.uri.href
     return paths.concat([ "user:#{@options.user}", "group:#{@options.group}" ])
 
-  post: ->
+  siblings: ->
     paths = _.select @paths, (path) -> path != '/'
     return _.map paths, pathResource
 

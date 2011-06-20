@@ -29,7 +29,7 @@ class User
   deps: ->
     return [ "group:#{@options.name}" ]
 
-  post: ->
+  siblings: ->
     Resource = require 'resource'
     homeDir = new Resource "path:#{@options.home}",
       type: 'dire', mode: 2700, user: @options.name, group: @options.name
