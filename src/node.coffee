@@ -36,6 +36,8 @@ checkIntegrity = (resourceMap) ->
 
 
 amendResource = (dispatchTable, resource) ->
+  return if resource.amending
+  resource.amending = true
   resource.amend().when (err) ->
     dispatchTable[resource.uri.href].future.deliver err
 
