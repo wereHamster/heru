@@ -11,42 +11,44 @@ loadModule = (name) ->
   return new (require path)(path.replace '/manifest.coffee', '')
 
 
-# Check the integrity of the given manifsts. That is, deliver an error if
-# two or more manifests provide the same resource.
+# Check the integrity of the resources. That is, deliver an error if two or
+# more manifests provide the same resource.
 checkIntegrity = (resourceMap) ->
   join = Futures.join()
+  join.add Futures.future().deliver null
 
-  conflicts = _.any resourceMap, (res, uri) -> return res == null
+  # For each conflict, deliver an error.
+  for key, resource of resourceMap
+    continue unless resource == null
 
-  if conflicts
-    # For each of those conflicts, deliver an error.
-    for key, resource of resourceMap
-      continue unless resource == null
-      future = Futures.future()
-
-      # Maybe we could print the manifests which provided those resources?
-      future.deliver new Error "#{key} provided by multiple different resources"
-
-      join.add future
-  else
-    # No conflict, yay!
-    join.add Futures.future().deliver null
+    # Maybe we could print the manifests which provided those resources?
+    future = Futures.future()
+    join.add future.deliver new Error "#{key} provided by multiple resources"
 
   return joinToFuture join, "Integrity check failed"
 
 
+# Run the amend() method on the resource, when it's done, deliver the result
+# to its corresponding future, so dependent resources can run.
 amendResource = (dispatchTable, resource) ->
   return if resource.amending
   resource.amending = true
+
   resource.amend().when (err) ->
     dispatchTable[resource.uri.href].future.deliver err
 
+
+# Register a handler on the join for the given resource. When the join is
+# delivered to, it means all dependencies for that resource have been
+# completed, so we can continue with this resource.
 registerCompletionHandler = (dispatchTable, res) ->
   dispatchTable[res.uri.href].join.when (err) ->
     amendResource dispatchTable, res
 
+
 # Generate a dispatch table where keys are resource URIs and values are
-# future objects which can be delivered to.
+# future/join objects. There is one dummy future in each join so that
+# resources without dependencies can run right away.
 futureDispatchTable = (resources) ->
   ret = {}
   for res in resources
@@ -56,6 +58,8 @@ futureDispatchTable = (resources) ->
   return ret
 
 
+# This is the core of the logic, It makes sure that all resources are amended
+# in the correct order.
 topologyDispatch = (resources) ->
   dispatchTable = futureDispatchTable resources
 
@@ -80,8 +84,8 @@ class Node
     @manifests = (loadModule name for name in spec.manifests)
 
 
-  # Initialize the node, make sure the resources in this node are consistent
-  # and not in conflict.
+  # Initialize the node, expand all resources and make sure that they are
+  # consisten and there are no conflicts.
   init: ->
     @resources = {}
     for manifest in @manifests

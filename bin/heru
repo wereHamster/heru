@@ -45,11 +45,15 @@ dumpError = (err, indent = 0) ->
     dumpError err, indent + 1
 
 
-# This is where it comes all together.
+# This is where it comes all together. First initialize the node. This gives
+# it a chance to load manifests, resolve resources etc.
 node.init().when (err) ->
   if err
     return dumpError err
 
+  # Everything looks fine so far, now verify that the node is in order.
+  # Ideally, this step would not perform any changes on the system. In reality
+  # it runs certain write operations. Somebody should fix that.
   node.verify().when (err) ->
     if err
       if '--dry-run' in process.argv
