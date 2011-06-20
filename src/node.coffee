@@ -16,19 +16,16 @@ loadModule = (name) ->
 checkIntegrity = (resourceMap) ->
   join = Futures.join()
 
-  # If an URI is priveded by more than one resource, it's a conflict.
-  conflicts = {}
-  _.each resourceMap, (v, k) ->
-    conflicts[k] = v if v.length > 1
+  conflicts = _.any resourceMap, (res, uri) -> return res == null
 
-  if _.values(conflicts).length > 0
+  if conflicts
     # For each of those conflicts, deliver an error.
-    for key, resources of conflicts
+    for key, resource of resourceMap
+      continue unless resource == null
       future = Futures.future()
 
       # Maybe we could print the manifests which provided those resources?
-      count = resources.length
-      future.deliver new Error "#{key} provided by #{count} different resources"
+      future.deliver new Error "#{key} provided by multiple different resources"
 
       join.add future
   else
@@ -38,56 +35,42 @@ checkIntegrity = (resourceMap) ->
   return joinToFuture join, "Integrity check failed"
 
 
-uniqueResources = (resources) ->
-  map = {}
-  for res in resources
-    map[res.uri.href] = res
-
-  return _.values map
-
 amendResource = (dispatchTable, resource) ->
   resource.amend().when (err) ->
-    dispatchTable[resource.uri.href].deliver err
-  return dispatchTable[resource.uri.href]
+    dispatchTable[resource.uri.href].future.deliver err
 
+registerCompletionHandler = (dispatchTable, res) ->
+  dispatchTable[res.uri.href].join.when (err) ->
+    amendResource dispatchTable, res
 
 # Generate a dispatch table where keys are resource URIs and values are
-# futere objects which can be delivered to.
+# future objects which can be delivered to.
 futureDispatchTable = (resources) ->
   ret = {}
   for res in resources
-    ret[res.uri.href] = { future: Futures.future(), join: Futures.join() }
+    join = Futures.join()
+    join.add Futures.future().deliver null
+    ret[res.uri.href] = { future: Futures.future(), join: join }
   return ret
 
 
 topologyDispatch = (resources) ->
-  dispatchTable = futureDispatchTable()
+  dispatchTable = futureDispatchTable resources
 
   ret = Futures.join()
-  addRet = (res, future) ->
-    dispatchTable[res.uri.href].join.add future
+  addRet = (res, dep) ->
+    future = dispatchTable[dep].future
+    dispatchTable[res].join.add future
     ret.add future
 
   for res in resources
     for dep in res.deps()
-      addRet res, dispatchTable[dep.uri.href].future
-
-    for post in res.post()
-      addRet post, dispatchTable[res.uri.href].future
+      addRet res.uri.href, dep
 
   for res in resources
-    if res.deps().length == 0
-      dispatchTable[res.uri.href].future.deliver null
-
-    dispatchTable[res.uri.href].join.when (err) ->
-      ((r) -> amendResource dispatchTable, r)(res)
+    registerCompletionHandler dispatchTable, res
 
   return joinToFuture ret, "topologyDispatch failed"
-
-removeWeakResources = (resources) ->
-  for res, index in resources
-    if res.weak()
-      resources.splice(index, index)
 
 
 class Node
@@ -102,22 +85,13 @@ class Node
     for manifest in @manifests
       expandResources @resources, _.values(manifest.resources)
 
-      for resource in _.values(manifest.resources)
-        expandResources @resources, resource.deps()
-        expandResources @resources, resource.post()
-
-    # Filter out weak resources
-    for uri, resources of @resources
-      console.log "#{uri}: #{resources.length}"
-      removeWeakResources resources
-
     return checkIntegrity @resources
 
 
   # The verify stage iterates over all resources and and checks if they are
   # in their desired state. If not, an error is returned through the future.
   verify: ->
-    @resources = uniqueResources _.map @resources, (v, k) -> v[0]
+    @resources = _.values @resources
     return joinMethods.call @, @resources, 'verify'
 
 

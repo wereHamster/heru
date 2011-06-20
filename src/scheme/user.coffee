@@ -27,21 +27,17 @@ class User
 
 
   deps: ->
-    Resource = require 'resource'
-    group = new Resource "group:#{@options.name}",
-      weak: @options.weak, gid: @options.uid
-
-    return [ group ] unless @options.weak
+    return [ "group:#{@options.name}" ]
 
   post: ->
     Resource = require 'resource'
     homeDir = new Resource "path:#{@options.home}",
-      weak: true, type: 'dire', mode: 2700, user: @options.name, group: @options.name
+      type: 'dire', mode: 2700, user: @options.name, group: @options.name
 
-    return [ homeDir ] unless @options.weak
+    group = new Resource "group:#{@options.name}",
+      gid: @options.uid
 
-  weak: ->
-    return @options.weak
+    return [ homeDir, group ]
 
   verify: ->
     future = Futures.future()

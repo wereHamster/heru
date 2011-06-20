@@ -33,9 +33,6 @@ class spkg
   post: ->
     return []
 
-  weak: ->
-    return false
-
   verify: ->
     return run 'verify', @name
 

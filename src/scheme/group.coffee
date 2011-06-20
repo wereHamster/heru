@@ -29,9 +29,6 @@ class Group
   post: ->
     return []
 
-  weak: ->
-    return @options.weak
-
   verify: ->
     future = Futures.future()
     exec "grep #{@options.name} /etc/group | cut -f3 -d:", (err, stdout, stderr) =>

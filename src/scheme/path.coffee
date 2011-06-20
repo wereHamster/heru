@@ -119,18 +119,12 @@ class Path
 
 
   deps: ->
-    paths = _.select @paths, (path) -> path != '/'
-    paths = _.map paths, pathResource
-    unless @options.weak
-      paths.push new Resource "group:#{@options.group}", { weak: true }
-      paths.push new Resource "user:#{@options.user}", { weak: true }
-    return paths
+    paths = _.map @post(), (res) -> res.uri.href
+    return paths.concat([ "user:#{@options.user}", "group:#{@options.group}" ])
 
   post: ->
-    return []
-
-  weak: ->
-    return false
+    paths = _.select @paths, (path) -> path != '/'
+    return _.map paths, pathResource
 
   verify: ->
     unless @options.type in ['dire', 'file']
