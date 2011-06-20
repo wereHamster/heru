@@ -8,8 +8,8 @@ Futures = require 'futures'
 
 # Command to create or update the user.
 cmd = '''
-  ( id "{{ name }}" 1>/dev/null 2>&1 || useradd "{{ name }}" ) &&
-  usermod -L -u "{{ uid }}" -g "{{ group }}" -d "{{ home }}" "{{ name }}";
+  ( id "{{ name }}" 1>/dev/null 2>&1 || useradd -g "{{ name }}" "{{ name }}" ) &&
+  usermod -L -u "{{ uid }}" -g "{{ group }}" -G "{{ group }}" -d "{{ home }}" "{{ name }}";
 '''
 
 uidBase =
