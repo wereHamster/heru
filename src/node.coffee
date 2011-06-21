@@ -10,6 +10,10 @@ loadModule = (name) ->
   path = require.resolve name + '/manifest'
   return new (require path)(path.replace '/manifest.coffee', '')
 
+loadModules = (name) ->
+  a = name.split '/'
+  return (loadModule a.slice(0, i + 1).join '/' for unused, i in a)
+
 
 # Check the integrity of the resources. That is, deliver an error if two or
 # more manifests provide the same resource.
@@ -81,7 +85,10 @@ topologyDispatch = (resources) ->
 
 class Node
   constructor: (@name, @spec)->
-    @manifests = (loadModule name for name in spec.manifests)
+    @manifests = []
+    for name in spec.manifests
+      for module in loadModules name
+        @manifests.push module
 
 
   # Initialize the node, expand all resources and make sure that they are
