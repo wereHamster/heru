@@ -82,20 +82,22 @@ topologyDispatch = (resources) ->
 
 
 class Node
+
+  # Initialize the node with the spec and expand all resources.
   constructor: (@name, @spec)->
     @manifests = []
     for name in spec.manifests
       for module in loadModules name
         @manifests.push module
 
-
-  # Initialize the node, expand all resources and make sure that they are
-  # consisten and there are no conflicts.
-  init: ->
     @resources = {}
     for manifest in @manifests
       expandResources @resources, _.values(manifest.resources)
 
+
+  # Initialize the node, expand all resources and make sure that they are
+  # consisten and there are no conflicts.
+  init: ->
     return checkIntegrity @resources
 
 

@@ -104,10 +104,9 @@ amendDirectory = (path, options) ->
   return future
 
 
-Resource = null
 pathResource = (path) ->
   Resource = require 'resource'
-  return new Resource "path:#{dirname(path)}",
+  return new Resource "path:#{path}",
     type: 'dire', mode: 0755, user: 'root', group: 'root'
 
 
@@ -121,7 +120,7 @@ class Path
     return paths.concat([ "user:#{@options.user}", "group:#{@options.group}" ])
 
   siblings: ->
-    paths = _.select @paths, (path) -> path != '/'
+    paths = _.select _.uniq(_.map(@paths, (path) -> dirname(path))), (path) -> path isnt '/'
     return _.map paths, pathResource
 
   verify: ->

@@ -70,7 +70,6 @@ exports.expandResources = (map, resources) ->
 
 
 exports.idHash = (str) ->
-  return _.reduce _.map(str.split(''), (c) ->
-    c.charCodeAt(0) - 97
-  ), (s, v) -> s + v
+  codes = _.map str.split(''), (c) -> c.charCodeAt(0) - 97
+  return _.reduce codes, ((s, v) -> s + v), 0
 
