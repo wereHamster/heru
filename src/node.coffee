@@ -90,27 +90,30 @@ class Node
       for module in loadModules name
         @manifests.push module
 
-    @resources = {}
+    @resourceMap = {}
     for manifest in @manifests
-      expandResources @resources, _.values(manifest.resources)
-
-
-  # Initialize the node, expand all resources and make sure that they are
-  # consisten and there are no conflicts.
-  init: ->
-    return checkIntegrity @resources
+      expandResources @resourceMap, _.values(manifest.resources)
 
 
   # The verify stage iterates over all resources and and checks if they are
   # in their desired state. If not, an error is returned through the future.
   verify: ->
-    @resources = _.values @resources
-    return joinMethods.call @, @resources, 'verify'
+    self = @
+    resources = _.values @resourceMap
+
+    future = Futures.future()
+    checkIntegrity(@resourceMap).when (err) ->
+      return future.deliver err if err
+
+      joinMethods.call(self, resources, 'verify').when (err) ->
+        future.deliver err
+
+    return future
 
 
   # Fix any incomplete resources.
   amend: ->
-    return topologyDispatch @resources
+    return topologyDispatch _.values @resourceMap
 
 
 module.exports = Node
