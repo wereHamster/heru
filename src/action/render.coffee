@@ -1,6 +1,6 @@
 
 fs = require 'fs'
-{ to_html: render} = require('mustache')
+{ to_html: render } = require('mustache')
 { join, existsSync } = require 'path'
 
 

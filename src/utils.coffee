@@ -1,6 +1,4 @@
 
-
-
 # Perform a bash-like brace expansion on the given string.
 exports.expand = (str) ->
   merge = (array, element) ->
