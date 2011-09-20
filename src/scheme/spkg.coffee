@@ -1,7 +1,5 @@
 
-{ _ } = require 'underscore'
 { exec } = require 'child_process'
-Futures = require 'futures'
 
 
 system = Futures.future()

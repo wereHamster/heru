@@ -1,12 +1,10 @@
 
-{ _ } = require 'underscore'
 fs = require 'fs'
 { statSync } = require 'fs'
 path = require 'path'
 existsSync = path.existsSync
 dirname = path.dirname
 { exec } = require 'child_process'
-Futures = require 'futures'
 { expand, joinToFuture } = require 'utils'
 
 # Find the UID of the given login and invoken the callback with it.

@@ -1,8 +1,6 @@
 
-{ _ } = require 'underscore'
 { exec } = require 'child_process'
 { to_html: render } = require 'mustache'
-Futures = require 'futures'
 { idHash } = require 'utils'
 
 

@@ -1,6 +1,4 @@
 
-{ _ } = require 'underscore'
-Futures = require 'futures'
 
 
 # Perform a bash-like brace expansion on the given string.

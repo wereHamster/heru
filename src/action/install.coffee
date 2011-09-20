@@ -5,7 +5,6 @@ http = require 'http'
 sys = require 'sys'
 child = require 'child_process'
 path = require 'path'
-Futures = require 'futures'
 
 download = (url, callback) ->
   { hostname, pathname } = parse url

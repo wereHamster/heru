@@ -1,9 +1,7 @@
 
-{ _ } = require 'underscore'
 { exec } = require 'child_process'
 url = require 'url'
 { to_html: render } = require 'mustache'
-Futures = require 'futures'
 
 
 # Command to create or update the group.

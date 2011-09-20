@@ -2,7 +2,6 @@
 fs = require 'fs'
 { to_html: render} = require('mustache')
 { join, existsSync } = require 'path'
-Futures = require 'futures'
 
 
 module.exports = (template) ->

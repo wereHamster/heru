@@ -1,6 +1,4 @@
 
-{ _ } = require 'underscore'
-Futures = require 'futures'
 { joinToFuture, joinMethods, expandResources, topoSort } = require 'utils'
 
 

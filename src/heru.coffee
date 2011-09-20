@@ -1,7 +1,6 @@
 
 exports.Version = 'v0.0.1'
 
-{ _ } = require 'underscore'
 url = require 'url'
 child = require 'child_process'
 fs = require 'fs'

@@ -11,6 +11,10 @@ runtime = realpathSync join __dirname, '../';
 require.paths.unshift join runtime, 'src'
 require.paths.unshift join runtime, 'vendor'
 
+# Export often-used modules to the global namespace
+global._ = require('underscore')._
+global.Futures = require 'futures'
+
 # The colors module extends the String prototype, it does not export anything.
 require 'colors'
 
@@ -24,7 +28,7 @@ require.paths.unshift(process.env.PWD + '/library')
 # Load the configuration for the given node.
 loadNode = (hostname) ->
   path = hostname.split('.').reverse()
-  require join process.env.PWD, 'nodes', path.join('/')
+  return require join process.env.PWD, 'nodes', path.join('/')
 
 # There is no way to get the FQDN in node. The user needs to supply the
 # hostname on the commandline.

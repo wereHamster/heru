@@ -1,6 +1,4 @@
 
-{ _ } = require 'underscore'
-Futures = require 'futures'
 schemeRegistry = require 'scheme'
 { expand, joinToFuture } = require 'utils'
 url = require 'url'

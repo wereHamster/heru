@@ -1,7 +1,6 @@
 
 fs = require 'fs'
 { join, existsSync } = require 'path'
-Futures = require 'futures'
 
 
 module.exports = (template) ->

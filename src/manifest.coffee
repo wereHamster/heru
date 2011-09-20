@@ -1,7 +1,5 @@
 
-{ _ } = require 'underscore'
 render = require('mustache').to_html
-Futures = require 'futures'
 { joinToFuture, joinMethods } = require 'utils'
 
 Resource = require 'resource'
