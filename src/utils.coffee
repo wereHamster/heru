@@ -69,7 +69,20 @@ exports.expandResources = (map, resources) ->
       exports.expandResources map, resource.siblings()
 
 
+# Convert a string to a id. Use a string hash, and limit the id between 1000
+# and 9999 (inclusive). The ID is suitable to be used as a UID or GID.
+
+ID_HASH_MIN = 1000
+ID_HASH_MAX = 9999
+
 exports.idHash = (str) ->
-  codes = _.map str.split(''), (c) -> c.charCodeAt(0) - 97
-  return _.reduce codes, ((s, v) -> s + v), 0
+  hash = 0
+  return ID_HASH_MIN if str.length == 0
+
+  for i in [0..(str.length - 1)]
+    char = str.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash
+
+  return ID_HASH_MIN + hash % (ID_HASH_MAX - ID_HASH_MIN)
 

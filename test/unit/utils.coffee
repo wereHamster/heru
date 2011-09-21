@@ -44,7 +44,7 @@ module.exports =
       assert.equal args[0].children[0].message, 'err'
 
   'idHash': ->
-    assert.equal idHash(''), 0
-    assert.equal idHash('a'), 0
-    assert.equal idHash('bear'), 22
-    assert.equal idHash('mole'), 41
+    assert.equal idHash(''), 1000
+    assert.equal idHash('a'), 1097
+    assert.equal idHash('bear'), 6035
+    assert.equal idHash('mole'), 1712

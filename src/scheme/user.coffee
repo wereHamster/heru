@@ -10,17 +10,12 @@ cmd = '''
   usermod -L -u "{{ uid }}" -g "{{ name }}" -G "{{ group }}" -d "{{ home }}" "{{ name }}";
 '''
 
-uidBase =
-  'staff' : 1000
-  'daemon': 9000
-
 class User
 
   constructor: (@resource, @uri, @options) ->
     @options.name = uri.host
 
-    base = uidBase[@options.group || 'daemon']
-    @options.uid = base + idHash(@options.name) unless @options.uid?
+    @options.uid = idHash(@options.name) unless @options.uid?
     @options.home = "/home/#{@options.name}" unless @options.home?
 
 
