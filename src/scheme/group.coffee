@@ -6,7 +6,7 @@ url = require 'url'
 
 # Command to create or update the group.
 cmd = '''
-  GID="$(grep "{{ name }}" /etc/group | cut -f3 -d: )"
+  GID="$(grep '^{{ name }}' /etc/group | cut -f3 -d: )"
   if test -z "$GID"; then
     groupadd -g "{{ gid }}" "{{ name }}"
   elif test "$GID" -ne "{{ gid }}"; then
@@ -29,7 +29,7 @@ class Group
 
   verify: ->
     future = Futures.future()
-    exec "grep #{@options.name} /etc/group | cut -f3 -d:", (err, stdout, stderr) =>
+    exec "grep '^#{@options.name}' /etc/group | cut -f3 -d:", (err, stdout, stderr) =>
       if err
         future.deliver err
       else if @options.gid and @options.gid isnt parseInt stdout
