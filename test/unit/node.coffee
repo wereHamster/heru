@@ -12,7 +12,6 @@ module.exports =
   '#constructor': ->
     resources = _.keys node.resourceMap
 
-    assert.length node.manifests, 2
     assert.length resources, 4
     assert.deepEqual resources, [ 'user:bob', 'path:/home/bob', 'path:/home', 'group:bob' ]
 

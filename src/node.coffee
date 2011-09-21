@@ -2,16 +2,6 @@
 { joinToFuture, joinMethods, expandResources, topoSort } = require 'utils'
 
 
-# Load the module and instanciate it. Pass it the base path so the module
-# knows where to load the assets from.
-loadModule = (name) ->
-  path = require.resolve name + '/manifest'
-  return new (require path)(path.replace '/manifest.coffee', '')
-
-loadModules = (name) ->
-  a = name.split '/'
-  return (loadModule a.slice(0, i + 1).join '/' for unused, i in a)
-
 
 # Check the integrity of the resources. That is, deliver an error if two or
 # more manifests provide the same resource.
@@ -81,18 +71,38 @@ topologyDispatch = (resources) ->
   return joinToFuture ret, "topologyDispatch failed"
 
 
+# ---------------------------------------------------------------------------
+# Loading manifest and resources
+# ---------------------------------------------------------------------------
+
+# Expand the manifest list. Entries such as 'base/ubuntu/10.04' are expanded to
+# [ 'base', 'base/ubuntu', 'base/ubuntu/10.04' ].
+expandManifestList = (manifests) ->
+  return _.flatten _.map manifests, (v) ->
+    a = v.split '/'; a.slice(0, i + 1).join '/' for unused, i in a
+
+# Load the manifest and instanciate it. Pass it the base path so the manifest
+# knows where to load the assets from.
+loadManifest = (name) ->
+  path = require.resolve name + '/manifest'
+  return new (require path)(path.replace '/manifest.coffee', '')
+
+# Map manifests to the resources within it.
+mapResources = (manifests, map = {}) ->
+  expandResources map, _.values manifest.resources for manifest in manifests
+  return map
+
+
+# ---------------------------------------------------------------------------
+# The Node class
+# ---------------------------------------------------------------------------
+
 class Node
 
   # Initialize the node with the spec and expand all resources.
   constructor: (@name, @spec)->
-    @manifests = []
-    for name in spec.manifests
-      for module in loadModules name
-        @manifests.push module
-
-    @resourceMap = {}
-    for manifest in @manifests
-      expandResources @resourceMap, _.values(manifest.resources)
+    manifests = _.map (expandManifestList spec.manifests), (m) -> loadManifest m
+    @resourceMap = mapResources manifests
 
 
   # The verify stage iterates over all resources and and checks if they are
