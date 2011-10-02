@@ -34,8 +34,11 @@ amendResource = (dispatchTable, resource) ->
 # delivered to, it means all dependencies for that resource have been
 # completed, so we can continue with this resource.
 registerCompletionHandler = (dispatchTable, res) ->
-  dispatchTable[res.uri.href].join.when (err) ->
-    amendResource dispatchTable, res
+  if res.incomplete
+    dispatchTable[res.uri.href].join.when (err) ->
+      amendResource dispatchTable, res
+  else
+    dispatchTable[res.uri.href].future.deliver null
 
 
 # Generate a dispatch table where keys are resource URIs and values are
