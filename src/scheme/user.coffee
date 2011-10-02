@@ -25,7 +25,7 @@ class User
   siblings: ->
     Resource = require 'resource'
     homeDir = new Resource "path:#{@options.home}",
-      type: 'dire', mode: 2700, user: @options.name, group: @options.name
+      type: 'dire', mode: 0750, user: @options.name, group: @options.name
 
     group = new Resource "group:#{@options.name}",
       gid: @options.uid
