@@ -58,7 +58,24 @@ class Resource
   # constructor and options.
   cmp: (other) ->
     return false if @scheme.constructor != other.scheme.constructor
-    return @scheme.cmp other
+    return @scheme.cmp other.scheme
+
+
+  # Weak resources are those created implicitely as dependencies or siblings
+  # of other resources. They are only created if no other non-weak resource
+  # exists.
+  weak: ->
+    return !! @options.weak
+
+
+  # Merge two resources. Correctly handles situation when one or both of the
+  # resources are null or weak.
+  @merge: (r1, r2) ->
+    return null if r1 is null or r2 is null
+    return r2 if r1.weak() and not r2.weak()
+    return r1 if r2.weak() and not r1.weak()
+    return r1.cmp(r2) and r1 or null
+
 
 module.exports = Resource
 

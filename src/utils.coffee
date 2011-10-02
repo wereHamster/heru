@@ -56,14 +56,12 @@ exports.expandResources = (map, resources) ->
   for resource in resources
     n = 0
     for key in resource.decompose()
-      continue if map[key] == null
-
       res = map[key]
       if _.isUndefined(res)
         map[key] = resource
         n = n + 1
-      else if !resource.cmp(res)
-        map[key] = null
+      else
+        map[key] = require('resource').merge map[key], resource
 
     if (n > 0)
       exports.expandResources map, resource.siblings()
