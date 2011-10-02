@@ -142,7 +142,13 @@ class Path
 
       when 'file'
         func = @options.action.call @resource.manifest
-        future = func.call @resource.manifest, @paths
+        func.call(@resource.manifest, @paths).when (err) =>
+          return future.deliver err if err
+
+          join = Futures.join()
+          join.add verifyPath path, @options for path in @paths
+          (joinToFuture join, "scheme #{@uri.href}").when (err) =>
+            future.deliver err
 
       else
         future.deliver new Error "Unknown type: #{@options.type}"
