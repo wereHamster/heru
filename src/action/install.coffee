@@ -5,6 +5,7 @@ http = require 'http'
 sys = require 'sys'
 child = require 'child_process'
 path = require 'path'
+{ basename } = require 'utils'
 
 download = (url, callback) ->
   { hostname, pathname } = parse url
@@ -27,11 +28,6 @@ download = (url, callback) ->
     callback err, null
 
   req.end()
-
-# Basename implementation, aware of extensions such as .tar.gz and .tar.bz2
-basename = (filename) ->
-  return filename.match(/^(.*)\.(tar.gz|tar.bz2|tar.xz)$/)[1] || path.basename(filename)
-
 
 unpack = (url, callback) ->
   download url, (err, filename) ->

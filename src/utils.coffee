@@ -1,4 +1,6 @@
 
+path = require 'path'
+
 # Perform a bash-like brace expansion on the given string.
 exports.expand = (str) ->
   merge = (array, element) ->
@@ -84,3 +86,8 @@ exports.idHash = (str) ->
 
   return ID_HASH_MIN + hash % (ID_HASH_MAX - ID_HASH_MIN)
 
+
+# Basename implementation, aware of extensions such as .tar.gz and .tar.bz2
+exports.basename = (filename) ->
+  m = filename.match(/^(.*)\.(tar.gz|tar.bz2|tar.xz)$/)
+  return m and m[1] or path.basename filename, path.extname filename

@@ -5,7 +5,7 @@ global._ = require 'underscore'
 assert = require 'assert'
 Resource = require 'resource'
 { Utils } = require 'heru'
-{ expand, joinToFuture, expandResources, topoSort, idHash } = Utils
+{ expand, joinToFuture, expandResources, topoSort, idHash, basename } = Utils
 
 module.exports =
   'expand': ->
@@ -48,3 +48,8 @@ module.exports =
     assert.equal idHash('a'), 1097
     assert.equal idHash('bear'), 6035
     assert.equal idHash('mole'), 1712
+
+  'basename': ->
+    assert.equal basename(''), ''
+    assert.equal basename('file.gz'), 'file'
+    assert.equal basename('file.tar.gz'), 'file'
