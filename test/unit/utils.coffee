@@ -48,6 +48,7 @@ module.exports =
     assert.equal idHash('a'), 1097
     assert.equal idHash('bear'), 6035
     assert.equal idHash('mole'), 1712
+    assert.equal idHash('zxcvbk'), 7990
 
   'basename': ->
     assert.equal basename(''), ''

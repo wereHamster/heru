@@ -84,7 +84,7 @@ exports.idHash = (str) ->
     hash = ((hash << 5) - hash) + char
     hash = hash & hash
 
-  return ID_HASH_MIN + hash % (ID_HASH_MAX - ID_HASH_MIN)
+  return ID_HASH_MIN + Math.abs(hash) % (ID_HASH_MAX - ID_HASH_MIN)
 
 
 # Basename implementation, aware of extensions such as .tar.gz and .tar.bz2
