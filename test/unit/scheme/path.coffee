@@ -21,7 +21,9 @@ module.exports =
 
   '#siblings': ->
     siblings = resource.siblings()
-
     assert.length siblings, 2
+
     assert.ok siblings[0] instanceof Resource
+    assert.equal siblings[0].priority(), 0
+
     assert.ok siblings[1] instanceof Resource

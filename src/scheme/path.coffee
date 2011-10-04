@@ -65,7 +65,7 @@ amendDirectory = (path, options) ->
 pathResource = (node, path) ->
   Resource = require 'resource'
   return new Resource node, "path:#{path}",
-    weak: true, type: 'dire', mode: 0755, user: 'root', group: 'root'
+    priority: 0, type: 'dire', mode: 0755, user: 'root', group: 'root'
 
 
 # ---------------------------------------------------------------------------

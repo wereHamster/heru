@@ -21,7 +21,9 @@ module.exports =
 
   '#siblings': ->
     siblings = resource.siblings()
-
     assert.length siblings, 2
+
     assert.equal siblings[0].uri.href, 'path:/home/bob'
+    assert.equal siblings[0].priority(), 1
+
     assert.equal siblings[1].uri.href, 'group:bob'

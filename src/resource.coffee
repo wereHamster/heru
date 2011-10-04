@@ -65,7 +65,7 @@ class Resource
   # take precedence. Priority is a number between 0 and 9 (inclusive). If
   # unspecified, then the priority is 3.
   priority: ->
-    return @options.priority or 3
+    return if @options.priority? then @options.priority else 3
 
 
   # Merge two resources based on their priority and the compare function.
