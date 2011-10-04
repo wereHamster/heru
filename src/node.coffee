@@ -86,9 +86,9 @@ expandManifestList = (manifests) ->
 
 # Load the manifest and instanciate it. Pass it the base path so the manifest
 # knows where to load the assets from.
-loadManifest = (name) ->
+loadManifest = (node, name) ->
   path = require.resolve name + '/manifest'
-  return new (require path)(path.replace '/manifest.coffee', '')
+  return new (require path)(node, path.replace '/manifest.coffee', '')
 
 # Map manifests to the resources within it.
 mapResources = (manifests, map = {}) ->
@@ -104,21 +104,23 @@ class Node
 
   # Initialize the node with the spec and expand all resources.
   constructor: (@name, @spec)->
-    manifests = _.map (expandManifestList spec.manifests), (m) -> loadManifest m
+    manifests = _.map (expandManifestList spec.manifests), (m) => loadManifest @, m
     @resourceMap = mapResources manifests
 
+  # Return the resource corresponding to the given key.
+  getResource: (key) ->
+    return @resourceMap[key]
 
   # The verify stage iterates over all resources and and checks if they are
   # in their desired state. If not, an error is returned through the future.
   verify: ->
-    self = @
     resources = _.values @resourceMap
 
     future = Futures.future()
-    checkIntegrity(@resourceMap).when (err) ->
+    checkIntegrity(@resourceMap).when (err) =>
       return future.deliver err if err
 
-      joinMethods.call(self, resources, 'verify').when (err) ->
+      joinMethods.call(@, resources, 'verify').when (err) =>
         future.deliver err
 
     return future

@@ -4,8 +4,11 @@ global._ = require 'underscore'
 
 assert = require 'assert'
 
+Node = require 'node'
 Resource = require 'resource'
-resource = new Resource 'user:bob',
+
+node = new Node 'test', {}
+resource = new Resource node, 'user:bob',
   uid: 42, group: 'staff', home: '/home/bob'
 
 module.exports =

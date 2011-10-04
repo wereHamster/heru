@@ -4,18 +4,13 @@ render = require('mustache').to_html
 
 Resource = require 'resource'
 class Manifest
-  constructor: (@base) ->
+  constructor: (node, @base) ->
     @name = @base.split('/').pop()
 
     @resources = { }
     for uri, initializer of @constructor.prototype
       continue if uri == 'constructor' or uri in _.keys Manifest.prototype
-      @resources[uri] = new Resource uri, initializer(), @
-
-  bootstrap: ->
-    future = Futures.future()
-    future.deliver null
-    return future
+      @resources[uri] = new Resource node, uri, initializer(), @
 
   verify: ->
     return joinMethods.call @, _.values(@resources), 'verify'

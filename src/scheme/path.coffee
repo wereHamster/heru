@@ -21,7 +21,7 @@ verifyPath = (path, options) ->
     return future.deliver new Error "#{path} has wrong type"
   if (stat.mode & 0777) isnt options.mode
     return future.deliver new Error "#{path} has wrong mode"
-  if stat.uid isnt idHash(options.user) or stat.gid isnt idHash(options.group)
+  if stat.uid isnt options.uid or stat.gid isnt options.gid
     return future.deliver new Error "#{path} has wrong uid/gid"
 
   return future.deliver null
@@ -38,8 +38,8 @@ applyPathOptions = (path, options) ->
 
   # Preserve SUID, SGID and sticky bit
   mode = (statSync(path).mode & 07000) | (options.mode & 0777)
-  join.add callbackToFuture fs.chmodSync, path, mode
-  join.add callbackToFuture fs.chownSync, path, idHash(options.user), idHash(options.group)
+  join.add callbackToFuture fs.chmod, path, mode
+  join.add callbackToFuture fs.chown, path, options.uid, options.gid
 
   return joinToFuture join, "applyPathOptions #{path}"
 
@@ -62,9 +62,9 @@ amendDirectory = (path, options) ->
   return future
 
 
-pathResource = (path) ->
+pathResource = (node, path) ->
   Resource = require 'resource'
-  return new Resource "path:#{path}",
+  return new Resource node, "path:#{path}",
     weak: true, type: 'dire', mode: 0755, user: 'root', group: 'root'
 
 
@@ -72,6 +72,7 @@ pathResource = (path) ->
 class Path
 
   constructor: (@resource, @uri, @options) ->
+    @node = resource.node
     @paths = expand @uri.pathname
 
   deps: ->
@@ -80,9 +81,12 @@ class Path
 
   siblings: ->
     paths = _.select _.uniq(_.map(@paths, (path) -> dirname(path))), (path) -> path isnt '/'
-    return _.map paths, pathResource
+    return _.map paths, (path) => pathResource @node, path
 
   verify: ->
+    @options.uid = @node.getResource("user:#{@options.user}").options.uid
+    @options.gid = @node.getResource("group:#{@options.group}").options.gid
+
     unless @options.type in ['dire', 'file']
       future = Futures.future()
       return future.deliver new Error "Unknown path type #{@options.type}"

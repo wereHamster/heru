@@ -4,14 +4,16 @@ global._ = require 'underscore'
 
 assert = require 'assert'
 
+Node = require 'node'
 Resource = require 'resource'
 
+node = new Node 'test', {}
 module.exports =
 
   'merge': ->
-    r1 = new Resource 'user:jane', {}, {}
-    r2 = new Resource 'user:jane', {}, {}
-    r3 = new Resource 'user:andy', {}, {}
+    r1 = new Resource node, 'user:jane', {}
+    r2 = new Resource node, 'user:jane', {}
+    r3 = new Resource node, 'user:andy', {}
 
     assert.isNull Resource.merge null, null
     assert.isNull Resource.merge null, r2

@@ -4,8 +4,11 @@ global._ = require 'underscore'
 
 assert = require 'assert'
 
+Node = require 'node'
 Resource = require 'resource'
-resource = new Resource 'path:/test/dir/{a,b,c/d}',
+
+node = new Node 'test', {}
+resource = new Resource node, 'path:/test/dir/{a,b,c/d}',
   type: 'file', mode: 0664, user: 'root', group: 'root'
 
 module.exports =

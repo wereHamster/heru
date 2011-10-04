@@ -5,7 +5,7 @@ url = require 'url'
 
 
 class Resource
-  constructor: (uri, @options = { }, @manifest) ->
+  constructor: (@node, uri, @options = { }, @manifest) ->
     @uri = url.parse uri
 
     scheme = schemeRegistry[@uri.protocol.replace ':', '']
@@ -61,9 +61,9 @@ class Resource
     return @scheme.cmp other.scheme
 
 
-  # Weak resources are those created implicitely as dependencies or siblings
+  # Weak resources are those created implicitly as dependencies or siblings
   # of other resources. They are only created if no other non-weak resource
-  # exists.
+  # exist.
   weak: ->
     return !! @options.weak
 

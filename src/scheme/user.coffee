@@ -24,10 +24,10 @@ class User
 
   siblings: ->
     Resource = require 'resource'
-    homeDir = new Resource "path:#{@options.home}",
+    homeDir = new Resource @resource.node, "path:#{@options.home}",
       type: 'dire', mode: 0750, user: @options.name, group: @options.name
 
-    group = new Resource "group:#{@options.name}",
+    group = new Resource @resource.node, "group:#{@options.name}",
       gid: @options.uid
 
     return [ homeDir, group ]
