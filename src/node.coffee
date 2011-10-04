@@ -2,7 +2,6 @@
 { joinToFuture, joinMethods, expandResources, topoSort } = require 'utils'
 
 
-
 # Check the integrity of the resources. That is, deliver an error if two or
 # more manifests provide the same resource.
 checkIntegrity = (resourceMap) ->
@@ -97,7 +96,9 @@ mapResources = (manifests, map = {}) ->
 
 
 # ---------------------------------------------------------------------------
-# The Node class
+# A node describes a host with all its resources that should be present on it.
+# Each host has a corresponding node definition in the nodes/ subdirectory.
+# Once the node is loaded, all its resources are loaded into memory.
 # ---------------------------------------------------------------------------
 
 class Node
@@ -107,9 +108,12 @@ class Node
     manifests = _.map (expandManifestList spec.manifests), (m) => loadManifest @, m
     @resourceMap = mapResources manifests
 
-  # Return the resource corresponding to the given key.
-  getResource: (key) ->
-    return @resourceMap[key]
+
+  # Return the resource corresponding to the given uri. This can be used for
+  # example to find a particular user to get his uid/gid or home.
+  getResource: (uri) ->
+    return @resourceMap[uri]
+
 
   # The verify stage iterates over all resources and and checks if they are
   # in their desired state. If not, an error is returned through the future.
