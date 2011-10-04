@@ -1,8 +1,14 @@
 
 schemeRegistry = require 'scheme'
-{ expand, joinToFuture } = require 'utils'
+{ expand } = require 'utils'
 url = require 'url'
 
+# ----------------------------------------------------------------------------
+# A resource is a file, user or group (other types may follow in the future).
+# The supplied options describe the particular resource in detail. The actual
+# implementation of the resource logic (how to verify its presence, what to do
+# if the resource does not exist etc) is defined in the scheme files.
+# ----------------------------------------------------------------------------
 
 class Resource
   constructor: (@node, uri, @options = { }, @manifest) ->
@@ -33,11 +39,8 @@ class Resource
   # configured. Return a future which will be delivered the result of this
   # step.
   verify: ->
-    future = Futures.future()
-    @scheme.verify().when (err) =>
+    return @scheme.verify().when (err) =>
       @incomplete = !!err
-      future.deliver err
-    return future
 
 
   # Run any steps necessary to bring this resource in order. Return a future
