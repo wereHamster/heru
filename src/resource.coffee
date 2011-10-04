@@ -1,7 +1,6 @@
 
-schemeRegistry = require 'scheme'
-{ expand } = require 'utils'
 url = require 'url'
+{ expand } = require 'utils'
 
 # ----------------------------------------------------------------------------
 # A resource is a file, user or group (other types may follow in the future).
@@ -14,7 +13,7 @@ class Resource
   constructor: (@node, uri, @options = { }, @manifest) ->
     @uri = url.parse uri
 
-    scheme = schemeRegistry[@uri.protocol.replace ':', '']
+    scheme = require "scheme/#{@uri.protocol.replace ':', ''}"
     @scheme = new scheme @, @uri, @options
 
 
