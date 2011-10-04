@@ -1,14 +1,7 @@
 
 exports.Version = 'v0.0.1'
-
-url = require 'url'
-child = require 'child_process'
-fs = require 'fs'
-
+exports.Utils = require 'utils'
 
 exports.Node = require 'node'
 exports.Manifest = require 'manifest'
 exports.Action = require 'action'
-
-exports.Utils = require 'utils'
-
