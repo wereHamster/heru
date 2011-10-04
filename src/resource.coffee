@@ -61,20 +61,21 @@ class Resource
     return @scheme.cmp other.scheme
 
 
-  # Weak resources are those created implicitly as dependencies or siblings
-  # of other resources. They are only created if no other non-weak resource
-  # exist.
-  weak: ->
-    return !! @options.weak
+  # The priority is used when merging resources to figure out which one should
+  # take precedence. Priority is a number between 0 and 9 (inclusive). If
+  # unspecified, then the priority is 3.
+  priority: ->
+    return @options.priority or 3
 
 
-  # Merge two resources. Correctly handles situation when one or both of the
-  # resources are null or weak.
+  # Merge two resources based on their priority and the compare function.
   @merge: (r1, r2) ->
     return null if r1 is null or r2 is null
-    return r2 if r1.weak() and not r2.weak()
-    return r1 if r2.weak() and not r1.weak()
-    return r1.cmp(r2) and r1 or null
+
+    if r1.priority() == r2.priority()
+      return r1.cmp(r2) and r1 or null
+
+    return r1.priority() > r2.priority() and r1 or r2
 
 
 module.exports = Resource
