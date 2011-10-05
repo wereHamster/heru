@@ -13,13 +13,18 @@ class Manifest
     @name = @base.split('/').pop()
 
     @resources = { }
-    for uri, initializer of @constructor.prototype
-      continue if uri == 'constructor' or Manifest.prototype[uri]
+    for key, initializer of @constructor.prototype
+      continue if key == 'constructor' or Manifest.prototype[key]
+
+      uri = @expand key
       @resources[uri] = new Resource node, uri, initializer(), @
 
 
   # Expand the string in the context of the manifest. The string has access
   # to all class variables defined in the manifest.
+  #
+  # TODO: Maybe rename to `render` or something to not clash with the `expand`
+  # utility function.
   expand: (str) ->
     render str, @constructor
 
