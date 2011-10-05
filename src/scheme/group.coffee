@@ -2,6 +2,7 @@
 { exec } = require 'child_process'
 url = require 'url'
 { to_html: render } = require 'mustache'
+{ idHash } = require 'utils'
 
 
 # Command to create or update the group.
@@ -19,7 +20,7 @@ class Group
 
   constructor: (@resource, @uri, @options) ->
     @options.name = uri.host
-
+    @options.gid = idHash(@options.name) unless @options.gid?
 
   deps: ->
     return []
