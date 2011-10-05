@@ -101,10 +101,20 @@ class Path
 
     switch @options.type
       when 'dire'
-        join = Futures.join()
-        join.add  amendDirectory path, @options for path in @paths
-        joinToFuture(join, "scheme #{@uri.href}").when (err) =>
-          future.deliver err
+        if @options.action
+          func = @options.action.call @resource.manifest
+          func.call(@resource.manifest, @paths).when (err) =>
+            return future.deliver err if err
+
+            join = Futures.join()
+            join.add applyPathOptions path, @options for path in @paths
+            joinToFuture(join, "scheme #{@uri.href}").when (err) =>
+              future.deliver err
+        else
+          join = Futures.join()
+          join.add amendDirectory path, @options for path in @paths
+          joinToFuture(join, "scheme #{@uri.href}").when (err) =>
+            future.deliver err
 
       when 'file'
         func = @options.action.call @resource.manifest
