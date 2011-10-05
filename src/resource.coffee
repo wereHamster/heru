@@ -22,7 +22,7 @@ class Resource
   # here, even if they are siblings. And not all sibling have to be
   # dependencies.
   deps: ->
-    @deps = _.once -> @scheme.deps()
+    @deps = _.once -> @scheme.deps().concat(@options.deps ? [])
     return @deps()
 
 

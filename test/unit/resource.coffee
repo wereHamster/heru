@@ -11,7 +11,7 @@ node = new Node 'test', {}
 
 userJane = new Resource node, 'user:jane', {}
 userAndy = new Resource node, 'user:andy', {}
-pathHome1 = new Resource node, 'path:/home', {}
+pathHome1 = new Resource node, 'path:/home', { deps: [ 'path:/etc'] }
 pathHome2 = new Resource node, 'path:/home', { priority: 7 }
 pathMultiple = new Resource node, 'path:/{a,b/c}', {}
 
@@ -20,6 +20,10 @@ module.exports =
   'constructor': ->
     assert.equal userJane.uri.href, 'user:jane'
     assert.ok userJane.scheme instanceof require 'scheme/user'
+
+  '#deps': ->
+    assert.length pathHome1.deps(), 3
+    assert.equal pathHome1.deps()[2], 'path:/etc'
 
   '.merge': ->
     assert.isNull Resource.merge null, null
