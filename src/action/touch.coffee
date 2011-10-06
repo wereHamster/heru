@@ -1,14 +1,14 @@
 
-fs = require 'fs'
-{ join, existsSync } = require 'path'
-
+{ exec } = require 'child_process'
+{ joinToFuture } = require 'utils'
 
 module.exports = (template) ->
   return (targets, callback) ->
+    join = Futures.join()
     for file in targets
-      fs.writeFileSync file, ''
+      future = Futures.future()
+      exec "touch #{file}", (err) -> future.deliver err
+      join.add future
 
-    future = Futures.future()
-    future.deliver null
-    return future
+    return joinToFuture join, "touch action"
 
