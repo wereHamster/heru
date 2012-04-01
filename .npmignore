@@ -1,0 +1,7 @@
+.npmignore
+.gitignore
+
+Makefile
+README.md
+
+test/
