@@ -69,6 +69,14 @@ pathResource = (node, path) ->
 
 
 # ---------------------------------------------------------------------------
+# A path is a resource which resides on the filesystem. It can be anything
+# which the underlying filesystem supports, though right now we only support
+# files and directories.
+# A single path resource may refer to multiple distinct dentries. This is the
+# case when the resource describes multiple paths which have the same
+# properties and can be created with a single action.
+# ---------------------------------------------------------------------------
+
 class Path
 
   constructor: (@resource, @uri, @options) ->
