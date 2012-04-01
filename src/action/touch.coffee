@@ -1,6 +1,6 @@
 
 { exec } = require 'child_process'
-{ joinToFuture } = require 'utils'
+{ joinToFuture } = require '../utils'
 
 module.exports = (template) ->
   return (targets, callback) ->

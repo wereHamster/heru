@@ -1,6 +1,6 @@
 
 render = require('mustache').to_html
-Resource = require 'resource'
+Resource = require './resource'
 
 # ---------------------------------------------------------------------------
 # A manifest is a container for resources. All resources within it share the

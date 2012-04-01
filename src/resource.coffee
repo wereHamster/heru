@@ -1,6 +1,6 @@
 
 url = require 'url'
-{ expand } = require 'utils'
+{ expand } = require './utils'
 
 # ----------------------------------------------------------------------------
 # A resource is a file, user or group (other types may follow in the future).

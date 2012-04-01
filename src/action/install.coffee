@@ -2,7 +2,7 @@
 path = require 'path'
 child = require 'child_process'
 { to_html: render } = require 'mustache'
-{ basename } = require 'utils'
+{ basename } = require '../utils'
 
 scriptTemplate = '''
   mkdir -p /tmp/heru && cd /tmp/heru && curl -sLO {{ source }} &&

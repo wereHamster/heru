@@ -3,5 +3,4 @@
 # use `this` to access properties and methods of the manifest.
 
 for action in [ 'Touch', 'Render', 'Install', 'Execute', 'Fail' ]
-  exports[action] = require "action/#{ action.toLowerCase() }"
-
+  exports[action] = require "./action/#{ action.toLowerCase() }"

@@ -1,5 +1,5 @@
 
-{ joinToFuture, joinMethods, expandResources, topoSort } = require 'utils'
+{ joinToFuture, joinMethods, expandResources, topoSort } = require './utils'
 
 
 # Check the integrity of the resources. That is, deliver an error if two or
