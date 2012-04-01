@@ -1,0 +1,23 @@
+{
+  "name": "heru", "version": "0.0.1",
+
+  "author":   "Tomas Carnecky <tomas.carnecky@gmail.com>",
+  "homepage": "https://github.com/wereHamster/heru",
+
+  "repository": {
+    "type": "git", "url": "git://github.com/wereHamster/heru.git"
+  },
+
+  "main": "index.js",
+
+  "dependencies": {
+    "coffee-script": "*",
+    "underscore":    "*",
+    "mustache":      "*",
+    "futures":       "*"
+  },
+
+  "devDependencies": {
+    "mocha": "*"
+  }
+}
