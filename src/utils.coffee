@@ -91,3 +91,18 @@ exports.idHash = (str) ->
 exports.basename = (filename) ->
   m = filename.match(/^(.*)\.(tar.gz|tar.bz2|tar.xz)$/)
   return m and m[1] or path.basename filename, path.extname filename
+
+
+exports.deepCompare = (x, y) ->
+  return true  if x is y
+  return false if typeof x isnt typeof y
+
+  for own k,v of x
+    return false unless y.hasOwnProperty k
+    return false if v isnt y[k]
+
+  for own k,v of y
+    return false unless x.hasOwnProperty k
+    return false if v isnt x[k]
+
+  return true

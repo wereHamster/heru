@@ -1,7 +1,7 @@
 
 { exec } = require 'child_process'
 { to_html: render } = require 'mustache'
-{ idHash } = require '../utils'
+{ idHash, deepCompare } = require '../utils'
 
 
 # Command to create or update the user.
@@ -50,7 +50,7 @@ class User
     return future
 
   cmp: (other) ->
-    return _.isEqual @options, other.options
+    return deepCompare @options, other.options
 
 
 module.exports = User

@@ -1,7 +1,7 @@
 assert = require('chai').assert
 
 { Resource, Utils } = require '../../'
-{ expand, joinToFuture, expandResources, topoSort, idHash, basename } = Utils
+{ expand, joinToFuture, expandResources, topoSort, idHash, basename, deepCompare } = Utils
 
 module.exports =
   'expand': ->
@@ -50,3 +50,10 @@ module.exports =
     assert.equal basename(''), ''
     assert.equal basename('file.gz'), 'file'
     assert.equal basename('file.tar.gz'), 'file'
+
+  'deepCompare': ->
+    assert.ok deepCompare {}, {}
+    assert.ok deepCompare { x:1 }, { x:1 }
+    assert.ok ! deepCompare { x:1 }, {}
+    assert.ok ! deepCompare { x:1 }, { x:2 }
+    assert.ok ! deepCompare { x:1 }, { y:1 }

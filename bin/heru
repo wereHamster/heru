@@ -26,7 +26,6 @@ function apply(hostname) {
   node.verify().when(function(err) {
     if (err) {
       if (program['dry-run']) {
-        console.log("dry run mode");
         dumpError(err, 0);
       } else {
         console.log('Node is in incomplete state. Taking corrective measures.');

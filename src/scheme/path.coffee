@@ -5,7 +5,7 @@ path = require 'path'
 existsSync = path.existsSync
 dirname = path.dirname
 { exec } = require 'child_process'
-{ expand, joinToFuture, idHash } = require '../utils'
+{ expand, joinToFuture, idHash, deepCompare } = require '../utils'
 
 typeMap =
   file: 'isFile'
@@ -140,7 +140,7 @@ class Path
     return future
 
   cmp: (other) ->
-    return _.isEqual @options, other.options
+    return deepCompare @options, other.options
 
 
 module.exports = Path
