@@ -1,11 +1,5 @@
-
-global.Futures = require 'futures'
-global._ = require 'underscore'
-
-assert = require 'assert'
-
-Node = require 'node'
-Resource = require 'resource'
+assert = require('chai').assert
+{ Node, Resource } = require '../../../'
 
 node = new Node 'test', {}
 resource = new Resource node, 'group:staff',

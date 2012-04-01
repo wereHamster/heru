@@ -1,10 +1,6 @@
+assert = require('chai').assert
 
-global.Futures = require 'futures'
-global._ = require 'underscore'
-
-assert = require 'assert'
-Resource = require 'resource'
-{ Utils } = require 'heru'
+{ Resource, Utils } = require '../../'
 { expand, joinToFuture, expandResources, topoSort, idHash, basename } = Utils
 
 module.exports =

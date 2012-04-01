@@ -17,11 +17,6 @@ var join = require('path').join
   , inspect = require('util').inspect;
 
 
-// Export often-used modules to the global namespace
-global._ = require('underscore')._
-global.Futures = require('futures');
-
-
 // Load the configuration for the given node.
 function loadNode(hostname) {
   var path = hostname.split('.').reverse();

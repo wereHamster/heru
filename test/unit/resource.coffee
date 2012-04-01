@@ -1,11 +1,7 @@
+assert = require('chai').assert
 
-global.Futures = require 'futures'
-global._ = require 'underscore'
-
-assert = require 'assert'
-
-Node = require 'node'
-Resource = require 'resource'
+global.library = __dirname + '/../'
+{ Node, Resource } = require '../../'
 
 node = new Node 'test', {}
 
@@ -19,7 +15,7 @@ module.exports =
 
   'constructor': ->
     assert.equal userJane.uri.href, 'user:jane'
-    assert.ok userJane.scheme instanceof require 'scheme/user'
+    assert.ok userJane.scheme instanceof require '../../src/scheme/user'
 
   '#deps': ->
     assert.length pathHome1.deps(), 3

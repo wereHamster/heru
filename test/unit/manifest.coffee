@@ -1,11 +1,6 @@
+assert = require('chai').assert
 
-global.Futures = require 'futures'
-global._ = require 'underscore'
-
-assert = require 'assert'
-
-Manifest = require 'manifest'
-
+{ Manifest } = require '../../'
 class TestManifest extends Manifest
   @var = '42'
 
@@ -21,4 +16,3 @@ module.exports =
 
     assert.length _.keys(manifest.resources), 2
     assert.deepEqual _.keys(manifest.resources), [ 'path:/test/42', 'user:bob' ]
-

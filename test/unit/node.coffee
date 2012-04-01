@@ -1,10 +1,7 @@
+assert = require('chai').assert
 
-global.Futures = require 'futures'
-global._ = require 'underscore'
-
-assert = require 'assert'
-
-Node = require 'node'
+global.library = __dirname + '/../'
+{ Node } = require '../../'
 node = new Node 'test', manifests: [ 'base/test' ]
 
 module.exports =
@@ -14,4 +11,3 @@ module.exports =
 
     assert.length resources, 4
     assert.deepEqual resources, [ 'user:bob', 'path:/home/bob', 'path:/home', 'group:bob' ]
-
