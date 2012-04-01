@@ -5,7 +5,7 @@ path = require 'path'
 existsSync = path.existsSync
 dirname = path.dirname
 { exec } = require 'child_process'
-{ expand, joinToFuture, idHash } = require 'utils'
+{ expand, joinToFuture, idHash } = require '../utils'
 
 typeMap =
   file: 'isFile'
@@ -63,7 +63,7 @@ amendDirectory = (path, options) ->
 
 
 pathResource = (node, path) ->
-  Resource = require 'resource'
+  Resource = require '../resource'
   return new Resource node, "path:#{path}",
     priority: 0, type: 'dire', mode: 0755, user: 'root', group: 'root'
 

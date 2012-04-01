@@ -13,7 +13,7 @@ class Resource
   constructor: (@node, uri, @options = { }, @manifest) ->
     @uri = url.parse uri
 
-    scheme = require "scheme/#{@uri.protocol.replace ':', ''}"
+    scheme = require "./scheme/#{@uri.protocol.replace ':', ''}"
     @scheme = new scheme @, @uri, @options
 
 

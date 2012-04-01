@@ -1,67 +1,65 @@
-#!/usr/bin/env coffee
+#!/usr/bin/env node
 
-{ join } = require 'path'
-{ realpathSync } = require 'fs'
-{ inspect } = require 'sys'
+require('colors');
+var heru = require('../'), Node = heru.Node;
 
-# Path to the runtime directory.
-runtime = realpathSync join __dirname, '../';
+var program = require('commander');
+program
+  .version(heru.Version.yellow)
+  .option('-l, --library <path>', 'specify the path to your library', String, process.env.PWD)
+  .option('-n, --node <node>', 'specify the node', String)
+  .parse(process.argv);
 
-# Add directories with the runtime files to the require path.
-require.paths.unshift join runtime, 'src'
-require.paths.unshift join runtime, 'vendor'
+global.library = program.library;
 
-# Export often-used modules to the global namespace
+var join = require('path').join
+  , realpathSync = require('fs').realpathSync
+  , inspect = require('util').inspect;
+
+
+// Export often-used modules to the global namespace
 global._ = require('underscore')._
-global.Futures = require 'futures'
-
-# The colors module extends the String prototype, it does not export anything.
-require 'colors'
-
-# Load the main heru module.
-heru = require 'heru'
-console.log "Heru #{ heru.Version.yellow }"
-
-# Hack. We need to have a better way to figure out where the library is.
-require.paths.unshift(process.env.PWD + '/library')
-
-# Load the configuration for the given node.
-loadNode = (hostname) ->
-  path = hostname.split('.').reverse()
-  return require join process.env.PWD, 'nodes', path.join('/')
-
-# There is no way to get the FQDN in node. The user needs to supply the
-# hostname on the commandline.
-spec = loadNode process.argv[process.argv.length - 1]
-node = new heru.Node process.argv[process.argv.length - 1], spec
-
-ind = (indent) ->
-  a = []
-  while indent--
-    a.push '  '
-  return a.join('')
-
-dumpError = (err, indent = 0) ->
-  console.log "#{ind(indent)}#{err.message}" if err
-  return unless err.children
-
-  for err in err.children
-    dumpError err, indent + 1
+global.Futures = require('futures');
 
 
-# This is where it comes all together. Ideally, the verify step would not
-# perform any changes on the system. In reality it runs certain write
-# operations. Somebody should fix that.
-node.verify().when (err) ->
-  if err
-    if '--dry-run' in process.argv
-      console.log "dry run mode"
-      dumpError err
-    else
-      console.log 'Node is in incomplete state. Taking corrective measures.'
-      dumpError err
-      node.amend().when (err) ->
-        dumpError err if err
-  else
-    console.log 'Node verified. Nothing to do'
+// Load the configuration for the given node.
+function loadNode(hostname) {
+  var path = hostname.split('.').reverse();
+  return require(join(program.library, 'nodes', path.join('/')));
+}
 
+
+// There is no way to get the FQDN in node. The user needs to supply the
+// hostname on the commandline.
+spec = loadNode(program.node);
+node = new Node(program.node, spec);
+
+
+function dumpError(err, indent) {
+  if (err) console.log(err.message);
+  if (!err.children) return;
+
+  err.children.forEach(function(err) {
+    dumpError(err, indent + 1);
+  });
+}
+
+// This is where it comes all together. Ideally, the verify step would not
+// perform any changes on the system. In reality it runs certain write
+// operations. Somebody should fix that.
+node.verify().when(function(err) {
+  if (err) {
+    if ('--dry-run' in process.argv) {
+      console.log("dry run mode");
+      dumpError(err, 0);
+    } else {
+      console.log('Node is in incomplete state. Taking corrective measures.');
+      dumpError(err, 0);
+      node.amend().when(function(err) {
+        if (err) dumpError(err, 0);
+      });
+    }
+  } else {
+    console.log('Node verified. Nothing to do');
+  }
+})

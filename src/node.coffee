@@ -1,5 +1,8 @@
 
 { joinToFuture, joinMethods, expandResources, topoSort } = require './utils'
+{ readFileSync } = require 'fs'
+CoffeeScript = require 'coffee-script'
+vm = require 'vm'
 
 
 # Check the integrity of the resources. That is, deliver an error if two or
@@ -83,15 +86,21 @@ expandManifestList = (manifests) ->
   return _.flatten _.map manifests, (v) ->
     a = v.split '/'; a.slice(0, i + 1).join '/' for unused, i in a
 
+heru = Manifest: require('./manifest'), Action: require('./action')
 # Load the manifest and instanciate it. Pass it the base path so the manifest
 # knows where to load the assets from.
 loadManifest = (node, name) ->
-  path = require.resolve name + '/manifest'
-  return new (require path)(node, path.replace '/manifest.coffee', '')
+  path = require.resolve library + '/manifests/' + name + '/manifest'
+  src = CoffeeScript.compile readFileSync(path, 'utf8'), bare: true
+  template = { module: {}, require: -> heru }
+  vm.runInContext src, (ctx = vm.createContext template), path
+  return new template.module.exports node, path.replace '/manifest.coffee', ''
 
 # Map manifests to the resources within it.
 mapResources = (manifests, map = {}) ->
-  expandResources map, _.values manifest.resources for manifest in manifests
+  for manifest in manifests
+    expandResources map, _.values manifest.resources
+
   return map
 
 

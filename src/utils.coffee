@@ -63,7 +63,7 @@ exports.expandResources = (map, resources) ->
         map[key] = resource
         n = n + 1
       else
-        map[key] = require('resource').merge map[key], resource
+        map[key] = require('./resource').merge map[key], resource
 
     if (n > 0)
       exports.expandResources map, resource.siblings()

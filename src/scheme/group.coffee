@@ -2,7 +2,7 @@
 { exec } = require 'child_process'
 url = require 'url'
 { to_html: render } = require 'mustache'
-{ idHash } = require 'utils'
+{ idHash } = require '../utils'
 
 
 # Command to create or update the group.
@@ -47,7 +47,7 @@ class Group
     return future
 
   cmp: (other) ->
-    return _.isEqual @options, other.options
+    @options.gid == other.options.gid and @options.name == other.options.name
 
 
 module.exports = Group

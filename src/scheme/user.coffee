@@ -1,7 +1,7 @@
 
 { exec } = require 'child_process'
 { to_html: render } = require 'mustache'
-{ idHash } = require 'utils'
+{ idHash } = require '../utils'
 
 
 # Command to create or update the user.
@@ -23,7 +23,7 @@ class User
     return [ "group:#{@options.name}" ]
 
   siblings: ->
-    Resource = require 'resource'
+    Resource = require '../resource'
     homeDir = new Resource @resource.node, "path:#{@options.home}",
       priority: 1, type: 'dire', mode: @options.mode ? 0750, user: @options.name, group: @options.name
 
