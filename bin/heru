@@ -3,22 +3,47 @@
 require('colors');
 var heru = require('../'), Node = heru.Node;
 
-var program = require('commander');
-program
-  .version(heru.Version.yellow)
-  .option('-l, --library <path>', 'specify the path to your library', String, process.env.PWD)
-  .option('-n, --node <node>', 'specify the node', String)
-  .parse(process.argv);
-
-global.library = program.library;
-
 var join = require('path').join
   , realpathSync = require('fs').realpathSync
   , inspect = require('util').inspect;
 
+var defaultLibraryPath = join(process.env.HOME, '.heru')
+
+var program = require('commander');
+program
+  .version(heru.Version.yellow)
+  .option('-l, --library <path>', 'path to the library', String, defaultLibraryPath)
+  .option('-n, --dry-run', 'do not make any changes to the system')
+
+program.command('apply <hostname>').action(apply);
+
+program.parse(process.argv);
+
+function apply(hostname) {
+  global.library = program.library;
+  var node = new Node(hostname, loadNodeSpec(hostname));
+
+  node.verify().when(function(err) {
+    if (err) {
+      if (program['dry-run']) {
+        console.log("dry run mode");
+        dumpError(err, 0);
+      } else {
+        console.log('Node is in incomplete state. Taking corrective measures.');
+        dumpError(err, 0);
+        node.amend().when(function(err) {
+          if (err) dumpError(err, 0);
+        });
+      }
+    } else {
+      console.log('Node verified. Nothing to do');
+    }
+  })
+}
+
 
 // Load the configuration for the given node.
-function loadNode(hostname) {
+function loadNodeSpec(hostname) {
   var path = hostname.split('.').reverse();
   return require(join(program.library, 'nodes', path.join('/')));
 }
@@ -26,8 +51,6 @@ function loadNode(hostname) {
 
 // There is no way to get the FQDN in node. The user needs to supply the
 // hostname on the commandline.
-spec = loadNode(program.node);
-node = new Node(program.node, spec);
 
 
 function dumpError(err, indent) {
@@ -38,23 +61,3 @@ function dumpError(err, indent) {
     dumpError(err, indent + 1);
   });
 }
-
-// This is where it comes all together. Ideally, the verify step would not
-// perform any changes on the system. In reality it runs certain write
-// operations. Somebody should fix that.
-node.verify().when(function(err) {
-  if (err) {
-    if ('--dry-run' in process.argv) {
-      console.log("dry run mode");
-      dumpError(err, 0);
-    } else {
-      console.log('Node is in incomplete state. Taking corrective measures.');
-      dumpError(err, 0);
-      node.amend().when(function(err) {
-        if (err) dumpError(err, 0);
-      });
-    }
-  } else {
-    console.log('Node verified. Nothing to do');
-  }
-})
