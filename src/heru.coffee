@@ -1,5 +1,5 @@
 
-exports.Version = 'v0.0.1'
+exports.Version = 'v0.0.2'
 exports.Utils = require './utils'
 
 exports.Node = require './node'
