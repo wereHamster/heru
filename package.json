@@ -20,5 +20,9 @@
   "devDependencies": {
     "mocha": "*",
     "chai":  "*"
+  },
+
+  "scripts": {
+    "test": "make test"
   }
 }
