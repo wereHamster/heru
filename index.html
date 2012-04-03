@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Heru by wereHamster</title>
+    
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Heru</h1>
+        <p>(quenya; english translation: lord, master)</p>
+        <p class="view"><a href="https://github.com/wereHamster/heru">View the Project on GitHub <small>wereHamster/heru</small></a></p>
+        <ul>
+          <li><a href="https://github.com/wereHamster/heru/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/wereHamster/heru/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/wereHamster/heru">Fork On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h2>What is it?</h2>
+
+<p>Heru, in its heart, is a DSL to describe the state of a UNIX system. You
+specify which files, user accounts, groups etc. should exist. If the system
+does not match the desired state, heru takes actions to correct that.</p>
+
+<p>In that regard it's very similar to <a href="http://projects.puppetlabs.com/projects/puppet">puppet</a>. In fact, much of heru
+was directly inspired by puppet. However, there are significant differences.
+The most important is that heru aims to be standalone. The goal is to not have
+any external dependencies. Just drop it into a folder and you're ready to go.
+Also, heru does not provide you with any infrastructure. You are expected to
+use whatever tools you are already using to distribute the configuration
+files. These two things together make heru very small, lightweight and
+hopefully easier to configure.</p>
+
+<h2>How does it work?</h2>
+
+<p>First you have to describe your hosts (nodes). Each node has its own file,
+and contains the network configuration and manifests which should be applied
+to it. A manifest is a collection of one or more resources which should be
+present.</p>
+
+<p>Let's take a closer look. A node description might look something like this:</p>
+
+<pre><code>exports.manifests = [
+  'sshd', 'mysql'
+]
+</code></pre>
+
+<p>The <code>sshd</code> manifest might describe that the file <code>/etc/ssh/sshd_config</code> needs
+to exist, have certain permissions and contents:</p>
+
+<pre><code>{ Manifest, Action } = require 'heru'
+class module.exports extends Manifest
+
+  'path:/etc/ssh/sshd_config': -&gt;
+    type: 'file', mode: 0644, user: 'root', group: 'root', action: -&gt;
+      Action.Render 'sshd_config'
+</code></pre>
+
+<p>If the file does not exist, heru will create it. The <code>Render</code> action takes the
+<code>sshd_config</code> template file and writes it to its correct location. There are
+other actions which you can use, and there are also cases where you don't have
+to specify an action.</p>
+
+<p>If the syntax seems familiar to you, it's maybe because heru and all its
+configuration files are written in <a href="http://jashkenas.github.com/coffee-script">Coffee-Script</a>. </p>
+
+<h2>How do I install it?</h2>
+
+<p>I recommend that you install heru into your <code>/root/.heru</code> folder, with the
+following structure:</p>
+
+<pre><code>runtime/  - The heru runtime (clone this repo here)
+library/  - Library with your manifests
+nodes/    - Node descriptions
+</code></pre>
+
+<p>Then you need to install <a href="http://nodejs.org/">Node.js</a> and <a href="http://jashkenas.github.com/coffee-script">Coffee-Script</a>.
+Node.js is fairly easy to compile (<code>./configure --without-ssl &amp;&amp; make</code>). You
+can clone Coffee-Script into a directory and then add its <code>bin/</code> folder to
+your path. In due time there will be a fully automated install script.</p>
+
+<h2>I like it, how do I help you?</h2>
+
+<p>This project has its home on <a href="https://github.com/wereHamster/heru">GitHub</a>. You can create tickets, fork
+the project and send me pull requests. </p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/wereHamster">wereHamster</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
